@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Diet Planner</title>
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #2196F3;
+            --bg-color: #f0f2f5;
+            --card-bg: #ffffff;
+            --text-color: #333;
+            --danger-color: #f44336;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 0;
+            color: var(--text-color);
+        }
+
+        /* --- Layout & Utility --- */
+        .container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .hidden { display: none !important; }
+
+        button {
+            cursor: pointer;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: opacity 0.3s;
+        }
+        button:hover { opacity: 0.9; }
+
+        .btn-primary { background-color: var(--primary-color); color: white; }
+        .btn-secondary { background-color: var(--secondary-color); color: white; }
+        .btn-danger { background-color: var(--danger-color); color: white; }
+        .btn-outline { background-color: transparent; border: 1px solid #ccc; color: #555; }
+
+        input, select {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .input-group label {
+            margin-bottom: 5px;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        /* --- View: Login --- */
+        #loginView {
+            max-width: 400px;
+            margin: 100px auto;
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        /* --- View: Dashboard --- */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .info-card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .tdee-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px dashed #ccc;
+        }
+
+        .plans-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .plan-card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            border-left: 5px solid var(--primary-color);
+            position: relative; /* For absolute positioning of delete button */
+        }
+
+        .plan-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .plan-card h3 { margin: 0 0 10px 0; font-size: 18px; padding-right: 20px; }
+        .plan-card p { margin: 0; color: #777; font-size: 14px; }
+
+        /* Delete Button Style */
+        .delete-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: transparent;
+            color: #999;
+            font-weight: bold;
+            font-size: 20px;
+            padding: 0 8px;
+            line-height: 1;
+        }
+        .delete-btn:hover {
+            color: var(--danger-color);
+            background: rgba(244, 67, 54, 0.1);
+        }
+
+        .add-plan-card {
+            border: 2px dashed #ccc;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: #ccc;
+            border-left: none;
+        }
+
+        .add-plan-card:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        /* --- View: Plan Detail --- */
+        .plan-header {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .plan-main {
+            display: flex;
+            gap: 20px;
+        }
+
+        .plan-sidebar {
+            flex: 1;
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 10px;
+            height: fit-content;
+        }
+
+        .plan-content {
+            flex: 2;
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .food-row, .unwanted-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { text-align: left; padding: 10px; border-bottom: 1px solid #eee; }
+        th { background-color: #f8f9fa; }
+
+        .nutrition-tags {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .tag {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .error-text {
+            color: var(--danger-color);
+            font-size: 0.85em;
+            margin-top: -8px;
+            margin-bottom: 10px;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+<div id="loginView">
+    <h2 id="authTitle">Smart Diet Login</h2>
+
+    <input type="text" id="loginUsername" placeholder="Username">
+    <input type="password" id="loginPassword" placeholder="Password">
+
+    <div id="signContainer" class="hidden">
+        <input type="text" id="loginSign" placeholder="Sign (Password Hint)" value="">
+        <small style="color: #666; display: block; margin-bottom: 10px;">
+            *Sign is used as a password hint if you forget it.
+        </small>
+    </div>
+
+    <button id="btnLogin" class="btn-primary" style="width: 100%" onclick="handleLogin()">Login</button>
+    <button id="btnSignupConfirm" class="btn-primary hidden" style="width: 100%; background-color: #2196F3;" onclick="handleSignup()">Create Account</button>
+
+    <div style="margin-top: 15px; text-align: center;">
+        <span id="toggleText">New here? </span>
+        <a href="#" style="color: var(--primary-color); text-decoration: none; font-weight: bold;" onclick="toggleAuthMode()">
+            <span id="toggleLinkText">Create an Account</span>
+        </a>
+    </div>
+
+    <p id="loginMsg" style="color: red; margin-top: 10px; font-size: 14px; text-align: center;"></p>
+</div>
+
+<div id="dashboardView" class="container hidden">
+    <div class="dashboard-header">
+        <h2>Welcome, <span id="dashUsername">User</span></h2>
+        <button class="btn-danger" onclick="logout()">Logout</button>
+    </div>
+
+    <div class="info-card">
+        <h3>Personal Information</h3>
+        <div class="info-grid">
+            <div class="input-group">
+                <label>Age</label>
+                <input type="number" id="userAge" placeholder="Age" onkeyup="calculateTDEE()">
+            </div>
+            <div class="input-group">
+                <label>Gender</label>
+                <select id="userGender" onchange="calculateTDEE()">
+                    <option value="">-- Select --</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>Weight (kg)</label>
+                <input type="number" id="userWeight" placeholder="Weight" onkeyup="calculateTDEE()">
+            </div>
+            <div class="input-group">
+                <label>Height (cm)</label>
+                <input type="number" id="userHeight" placeholder="Height" onkeyup="calculateTDEE()">
+            </div>
+        </div>
+
+        <div class="tdee-grid">
+            <div class="input-group">
+                <label>Activity Level (影响TDEE)</label>
+                <select id="activityLevel" onchange="calculateTDEE()">
+                    <option value="1.2">Sedentary (Little or no exercise)</option>
+                    <option value="1.375" selected>Lightly active (1-3 days/week)</option>
+                    <option value="1.55">Moderately active (3-5 days/week)</option>
+                    <option value="1.725">Very active (6-7 days/week)</option>
+                    <option value="1.9">Extremely active (Daily, professional)</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>Recommended Daily Calories (TDEE)</label>
+                <h4 id="tdeeResult" style="margin: 0; margin-top: 10px; color: var(--primary-color);">-- Kcal</h4>
+            </div>
+        </div>
+
+        <button class="btn-secondary" style="margin-top: 15px;" onclick="updatePersonInfo()">Update Info</button>
+        <p id="infoMsg" style="color: red; margin-top: 10px;"></p>
+    </div>
+
+    <h3>My Diet Plans</h3>
+    <div class="plans-grid" id="plansGrid">
+    </div>
+</div>
+
+<div id="planDetailView" class="container hidden">
+    <button class="btn-outline" onclick="showDashboard()">← Back to Dashboard</button>
+    <div style="margin-top: 15px;"></div>
+
+    <div class="plan-header">
+        <div style="flex: 1;">
+            <label>Plan Name</label>
+            <input type="text" id="planNameInput" placeholder="My Diet Plan" onblur="checkPlanNameUnique()">
+            <small id="nameError" class="error-text hidden">Plan name already exists. Cannot save.</small>
+        </div>
+        <div style="flex: 1;">
+            <label>Target Calories</label>
+            <input type="number" id="targetCalories" value="2000">
+        </div>
+    </div>
+
+    <div class="plan-main">
+        <div class="plan-sidebar">
+            <h4>1. Macros (%)</h4>
+            <div style="display: flex; gap: 10px;">
+                <div class="input-group">
+                    <label for="macroP" style="font-size: 12px; margin-bottom: 2px;">Protein</label>
+                    <input type="number" id="macroP" value="30">
+                </div>
+                <div class="input-group">
+                    <label for="macroC" style="font-size: 12px; margin-bottom: 2px;">Carbs</label>
+                    <input type="number" id="macroC" value="50">
+                </div>
+                <div class="input-group">
+                    <label for="macroF" style="font-size: 12px; margin-bottom: 2px;">Fats</label>
+                    <input type="number" id="macroF" value="20">
+                </div>
+            </div>
+
+            <h4>2. Wanted Foods</h4>
+            <div id="wantedList"></div>
+            <button class="btn-outline" style="width:100%; margin-top:5px;" onclick="addWantedRow()">+ Add Food</button>
+
+            <h4>3. Unwanted Foods (Blacklist)</h4>
+            <div id="unwantedList"></div>
+            <button class="btn-outline" style="width:100%; margin-top:5px;" onclick="addUnwantedRow()">+ Add Unwanted</button>
+
+            <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
+            <button class="btn-primary" style="width:100%" onclick="generatePlan()">Generate / Recalculate</button>
+        </div>
+
+        <div class="plan-content">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h4>Plan Result</h4>
+                <div id="nutritionTags" class="nutrition-tags">
+                </div>
+            </div>
+
+            <table id="resultTable">
+                <thead>
+                <tr>
+                    <th>Food</th>
+                    <th>Grams</th>
+                    <th>Kcal</th>
+                    <th>Protein / Carbs / Fats</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr><td colspan="4" style="text-align:center; color:#999;">Click Generate to see results</td></tr>
+                </tbody>
+            </table>
+
+            <div id="autoAddedAlert" style="margin-top: 15px; color: #ff9800; font-size: 0.9em; display: none;">
+                <strong>Auto-added:</strong> <span id="autoAddedText"></span>
+            </div>
+
+            <div style="margin-top: 30px; text-align: right;">
+                <button class="btn-primary" id="btnSavePlan" onclick="savePlanToDB()">Save Plan to Database</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Configuration
+    const API_URL = "https://diet-plan-g7mk.onrender.com";
+
+    // Global State
+    let currentUser = null;
+    let currentPlanResult = null; // Store the latest calculation result for saving
+    let currentDietRequest = null; // Store the request params for saving
+    let originalPlanName = null; // Used to track if we are renaming or overwriting self
+
+    // ================= HELPER FUNCTIONS =================
+    function showView(viewId) {
+        ['loginView', 'dashboardView', 'planDetailView'].forEach(id => {
+            document.getElementById(id).classList.add('hidden');
+        });
+        document.getElementById(viewId).classList.remove('hidden');
+    }
+
+    async function apiCall(endpoint, method, body, showError = true) {
+        try {
+            const options = {
+                method: method,
+                headers: { 'Content-Type': 'application/json' }
+            };
+            if (body) options.body = JSON.stringify(body);
+
+            const res = await fetch(API_URL + endpoint, options);
+            if (!res.ok) throw new Error(`API Error: ${res.status}`);
+            return await res.json();
+        } catch (err) {
+            console.error(err);
+            if (showError) {
+                alert("Operation failed: " + err.message);
+            }
+            return null;
+        }
+    }
+
+    // ================= TDEE CALCULATION =================
+    function calculateTDEE() {
+        const age = parseFloat(document.getElementById('userAge').value);
+        const weight = parseFloat(document.getElementById('userWeight').value);
+        const height = parseFloat(document.getElementById('userHeight').value);
+        const gender = document.getElementById('userGender').value;
+        const activityFactor = parseFloat(document.getElementById('activityLevel').value);
+        const resultH4 = document.getElementById('tdeeResult');
+
+        if (!(age > 0) || !(weight > 0) || !(height > 0) || !gender || isNaN(activityFactor)) {
+            resultH4.innerText = '-- Kcal';
+            return;
+        }
+
+        let bmr;
+        if (gender === 'Male') {
+            bmr = (10 * weight) + (6.25 * height) - (5 * age) + 5;
+        } else if (gender === 'Female') {
+            bmr = (10 * weight) + (6.25 * height) - (5 * age) - 161;
+        } else {
+            resultH4.innerText = '-- Kcal';
+            return;
+        }
+
+        const tdee = bmr * activityFactor;
+        resultH4.innerText = `${Math.round(Math.max(0, tdee))} Kcal`;
+    }
+
+    // ================= LOGIN & AUTH LOGIC =================
+    let isSignupMode = false;
+
+    function toggleAuthMode() {
+        isSignupMode = !isSignupMode;
+        const signContainer = document.getElementById('signContainer');
+        const btnLogin = document.getElementById('btnLogin');
+        const btnSignupConfirm = document.getElementById('btnSignupConfirm');
+        const authTitle = document.getElementById('authTitle');
+        const toggleText = document.getElementById('toggleText');
+        const toggleLinkText = document.getElementById('toggleLinkText');
+        const msg = document.getElementById('loginMsg');
+
+        msg.innerText = "";
+
+        if (isSignupMode) {
+            authTitle.innerText = "Create Account";
+            signContainer.classList.remove('hidden');
+            btnLogin.classList.add('hidden');
+            btnSignupConfirm.classList.remove('hidden');
+            toggleText.innerText = "Already have an account? ";
+            toggleLinkText.innerText = "Login here";
+        } else {
+            authTitle.innerText = "Smart Diet Login";
+            signContainer.classList.add('hidden');
+            btnLogin.classList.remove('hidden');
+            btnSignupConfirm.classList.add('hidden');
+            toggleText.innerText = "New here? ";
+            toggleLinkText.innerText = "Create an Account";
+        }
+    }
+
+    async function handleLogin() {
+        const u = document.getElementById('loginUsername').value;
+        const p = document.getElementById('loginPassword').value;
+        const msgLabel = document.getElementById('loginMsg');
+
+        if(!u || !p) {
+            msgLabel.innerText = "Please enter username and password.";
+            return;
+        }
+
+        const res = await apiCall('/api/login', 'POST', { username: u, password: p });
+
+        if (res) {
+            if (res.code === 1) {
+                currentUser = u;
+                document.getElementById('dashUsername').innerText = u;
+                loadDashboard();
+            } else {
+                msgLabel.style.color = "red";
+                msgLabel.innerText = res.sign;
+            }
+        } else {
+            msgLabel.innerText = "Network error or server unavailable.";
+        }
+    }
+
+    async function handleSignup() {
+        const u = document.getElementById('loginUsername').value;
+        const p = document.getElementById('loginPassword').value;
+        const s = document.getElementById('loginSign').value;
+        const msgLabel = document.getElementById('loginMsg');
+
+        if(!u || !p || !s) {
+            msgLabel.innerText = "Please fill in all fields (including Sign).";
+            return;
+        }
+
+        const res = await apiCall('/api/create-account', 'POST', { username: u, password: p, sign: s });
+
+        if (res) {
+            if (res.code === 4) {
+                alert("Account created successfully! Please login.");
+                toggleAuthMode();
+                document.getElementById('loginMsg').style.color = "green";
+                document.getElementById('loginMsg').innerText = "Account created. Please login.";
+            } else {
+                msgLabel.style.color = "red";
+                msgLabel.innerText = res.sign;
+            }
+        }
+    }
+
+    function logout() {
+        currentUser = null;
+        showView('loginView');
+        document.getElementById('loginUsername').value = "";
+        document.getElementById('loginPassword').value = "";
+    }
+
+    // ================= DASHBOARD =================
+    async function loadDashboard() {
+        showView('dashboardView');
+
+        // Reset fields
+        document.getElementById('infoMsg').innerText = "";
+        document.getElementById('plansGrid').innerHTML = '';
+
+        let data = await apiCall('/api/homepage', 'POST', { username: currentUser }, false);
+
+        if (!data) {
+            data = { plans: [], personinfo: {} };
+        }
+
+        // Fill Person Info if available
+        if (data.personinfo) {
+            document.getElementById('userAge').value = data.personinfo.age || "";
+            document.getElementById('userGender').value = data.personinfo.gender || "";
+            document.getElementById('userWeight').value = data.personinfo.weight || "";
+            document.getElementById('userHeight').value = data.personinfo.height || "";
+            calculateTDEE();
+        }
+
+        // Render Grid
+        const grid = document.getElementById('plansGrid');
+
+        // "Add Plan" button
+        const addCard = document.createElement('div');
+        addCard.className = 'plan-card add-plan-card';
+        addCard.innerHTML = '+';
+        addCard.onclick = () => openPlanEditor(null);
+        grid.appendChild(addCard);
+
+        // Render existing plans with DELETE button
+        if (data.plans && Array.isArray(data.plans)) {
+            data.plans.forEach(planName => {
+                const card = document.createElement('div');
+                card.className = 'plan-card';
+                // Note the delete button with onclick stopPropagation
+                card.innerHTML = `
+                    <button class="delete-btn" onclick="deletePlan(event, '${planName}')" title="Delete Plan">×</button>
+                    <h3>${planName}</h3>
+                    <p>Click to view details</p>
+                `;
+                // Click on card opens details
+                card.onclick = () => openPlanEditor(planName);
+                grid.appendChild(card);
+            });
+        }
+    }
+
+    // --- DELETE PLAN LOGIC ---
+    async function deletePlan(event, planName) {
+        // Prevent opening the plan detail
+        event.stopPropagation();
+
+        if(!confirm(`Are you sure you want to delete plan "${planName}"?`)) {
+            return;
+        }
+
+        // Call Delete API
+        // Matches Class DeletePlanRequest { public String username; public String planname; }
+        const res = await apiCall('/api/delete-plan', 'POST', {
+            username: currentUser,
+            planname: planName
+        });
+
+        if (res === true || res) {
+            // Reload dashboard to reflect changes
+            loadDashboard();
+        }
+    }
+
+    async function updatePersonInfo() {
+        const infoMsg = document.getElementById('infoMsg');
+        infoMsg.innerText = "";
+
+        const age = document.getElementById('userAge').value;
+        const gender = document.getElementById('userGender').value;
+        const weight = document.getElementById('userWeight').value;
+        const height = document.getElementById('userHeight').value;
+
+        if (!age || !gender || !weight || !height) {
+            infoMsg.innerText = "Please fill in Age, Gender, Weight, and Height.";
+            return;
+        }
+
+        const info = { age: age, gender: gender, weight: weight, height: height };
+        const res = await apiCall('/api/person', 'POST', { username: currentUser, personinfo: info });
+
+        if (res) {
+            infoMsg.style.color = "green";
+            infoMsg.innerText = "Info Updated Successfully!";
+            calculateTDEE();
+        } else {
+            infoMsg.style.color = "red";
+            infoMsg.innerText = "Info Update Failed.";
+        }
+    }
+
+    // ================= PLAN EDITOR =================
+
+    function showDashboard() {
+        loadDashboard();
+    }
+
+    async function openPlanEditor(planName) {
+        showView('planDetailView');
+        clearPlanInputs();
+
+        // Reset Error State
+        document.getElementById('nameError').classList.add('hidden');
+        document.getElementById('planNameInput').classList.remove('error');
+        document.getElementById('btnSavePlan').disabled = false;
+
+        if (planName) {
+            // Load Existing
+            originalPlanName = planName; // Save original name to allow saving it back
+            document.getElementById('planNameInput').value = planName;
+
+            const data = await apiCall('/api/get-plan', 'POST', { username: currentUser, planname: planName });
+            if (data) {
+                populatePlanEditor(data.dr, data.result);
+            }
+        } else {
+            // New Plan
+            originalPlanName = null; // New plan has no original name
+            document.getElementById('planNameInput').value = `Plan-${Date.now()}`;
+            addWantedRow();
+        }
+    }
+
+    function clearPlanInputs() {
+        document.getElementById('wantedList').innerHTML = '';
+        document.getElementById('unwantedList').innerHTML = '';
+        document.querySelector('#resultTable tbody').innerHTML = '';
+        document.getElementById('nutritionTags').innerHTML = '';
+        document.getElementById('autoAddedAlert').style.display = 'none';
+        currentPlanResult = null;
+    }
+
+    function populatePlanEditor(request, result) {
+        if (!request) return;
+
+        document.getElementById('targetCalories').value = request.targetCalories || 2000;
+        if (request.macros) {
+            document.getElementById('macroP').value = request.macros.protein;
+            document.getElementById('macroC').value = request.macros.carbs;
+            document.getElementById('macroF').value = request.macros.fats;
+        }
+        if (request.foods) {
+            request.foods.forEach(f => addWantedRow(f.foodNames, f.foodQuantity));
+        }
+        if (request.notWantedFoods) {
+            request.notWantedFoods.forEach(f => addUnwantedRow(f));
+        }
+        if (result) {
+            renderResults(result);
+            currentPlanResult = result;
+            currentDietRequest = request;
+        }
+    }
+
+    // --- Dynamic Rows ---
+    function addWantedRow(name = "", qty = 100) {
+        const div = document.createElement('div');
+        div.className = 'food-row';
+        div.innerHTML = `
+            <input type="text" placeholder="Food Name" class="inp-name" value="${name}">
+            <input type="number" placeholder="g" class="inp-qty" value="${qty}" style="width: 80px;">
+            <button class="btn-danger" style="padding: 5px 10px;" onclick="this.parentElement.remove()">X</button>
+        `;
+        document.getElementById('wantedList').appendChild(div);
+    }
+
+    function addUnwantedRow(name = "") {
+        const div = document.createElement('div');
+        div.className = 'unwanted-row';
+        div.innerHTML = `
+            <input type="text" placeholder="Unwanted Food Name" class="inp-unwant" value="${name}">
+            <button class="btn-danger" style="padding: 5px 10px;" onclick="this.parentElement.remove()">X</button>
+        `;
+        document.getElementById('unwantedList').appendChild(div);
+    }
+
+    // --- Generate Logic ---
+    async function generatePlan() {
+        const targetCalories = parseFloat(document.getElementById('targetCalories').value);
+        const foods = [];
+        document.querySelectorAll('#wantedList .food-row').forEach(row => {
+            const n = row.querySelector('.inp-name').value;
+            const q = row.querySelector('.inp-qty').value;
+            if(n) foods.push({ foodNames: n, foodQuantity: parseInt(q) });
+        });
+
+        const notWanted = [];
+        document.querySelectorAll('#unwantedList .unwanted-row').forEach(row => {
+            const n = row.querySelector('.inp-unwant').value;
+            if(n) notWanted.push(n);
+        });
+
+        const macros = {
+            protein: parseFloat(document.getElementById('macroP').value),
+            carbs: parseFloat(document.getElementById('macroC').value),
+            fats: parseFloat(document.getElementById('macroF').value)
+        };
+
+        const payload = {
+            username: currentUser,
+            planname: document.getElementById('planNameInput').value,
+            targetCalories: targetCalories,
+            foods: foods,
+            notWantedFoods: notWanted,
+            macros: macros
+        };
+
+        const result = await apiCall('/api/generate-plan', 'POST', payload);
+        if (result) {
+            renderResults(result);
+            currentPlanResult = result;
+            currentDietRequest = payload;
+        }
+    }
+
+    function renderResults(data) {
+        const summary = data.nutritionSummary;
+        const tagsDiv = document.getElementById('nutritionTags');
+        // Modified: Using Full Names for Tags as well
+        if (summary) {
+            tagsDiv.innerHTML = `
+                <span class="tag">Cal: ${summary['Total Calories']}</span>
+                <span class="tag">Protein: ${summary['Total Protein (g)']}g</span>
+                <span class="tag">Carbs: ${summary['Total Carbs (g)']}g</span>
+                <span class="tag">Fats: ${summary['Total Fat (g)']}g</span>
+            `;
+        }
+
+        const tbody = document.querySelector('#resultTable tbody');
+        tbody.innerHTML = '';
+        if (data.plan) {
+            data.plan.forEach(item => {
+                const ratio = item.grams / 100;
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${item.name} ${item.isAutoAdded ? '(Auto)' : ''}</td>
+                        <td>${item.grams}g</td>
+                        <td>${(item.caloriesPer100g * ratio).toFixed(1)}</td>
+                        <td>${(item.proteinPer100g*ratio).toFixed(1)} / ${(item.carbsPer100g*ratio).toFixed(1)} / ${(item.fatPer100g*ratio).toFixed(1)}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        const alertDiv = document.getElementById('autoAddedAlert');
+        if (data.autoAddedItems && data.autoAddedItems.length > 0) {
+            alertDiv.style.display = 'block';
+            document.getElementById('autoAddedText').innerText = data.autoAddedItems.join(", ");
+        } else {
+            alertDiv.style.display = 'none';
+        }
+    }
+
+    // --- DUPLICATE NAME CHECK LOGIC ---
+    async function checkPlanNameUnique() {
+        const inputName = document.getElementById('planNameInput').value.trim();
+        const errorEl = document.getElementById('nameError');
+        const btnSave = document.getElementById('btnSavePlan');
+
+        // If name matches the original plan name (we are editing it), it is valid.
+        if (originalPlanName && inputName === originalPlanName) {
+            errorEl.classList.add('hidden');
+            btnSave.disabled = false;
+            return true;
+        }
+
+        if (!inputName) return false;
+
+        // Fetch all plans to check duplication
+        const data = await apiCall('/api/homepage', 'POST', { username: currentUser }, false);
+        if (data && data.plans && Array.isArray(data.plans)) {
+            if (data.plans.includes(inputName)) {
+                // Duplicate found
+                errorEl.classList.remove('hidden');
+                btnSave.disabled = true;
+                return false;
+            }
+        }
+
+        // No duplicate
+        errorEl.classList.add('hidden');
+        btnSave.disabled = false;
+        return true;
+    }
+
+    // --- Save Logic ---
+    async function savePlanToDB() {
+        if (!currentPlanResult || !currentDietRequest) {
+            alert("Please generate a plan first.");
+            return;
+        }
+
+        const planName = document.getElementById('planNameInput').value.trim();
+        if (!planName) { alert("Please enter a plan name"); return; }
+
+        // Final check for duplicates before saving
+        const isUnique = await checkPlanNameUnique();
+        if (!isUnique) {
+            alert("Cannot save: Plan name already exists.");
+            return;
+        }
+
+        const body = {
+            username: currentUser,
+            planname: planName,
+            dr: currentDietRequest,
+            result: currentPlanResult
+        };
+
+        const res = await apiCall('/api/save-plan', 'POST', body);
+
+        if (res === true || res) {
+            alert("Plan Saved Successfully!");
+            // Update original name to the new saved name so subsequent saves work
+            originalPlanName = planName;
+        }
+    }
+</script>
+
+</body>
+</html>
