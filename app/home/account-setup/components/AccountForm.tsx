@@ -108,15 +108,25 @@ const AccountForm = ({ username }: AccountFormProps) => {
                 })
             })
 
-            if(res) {
+            if (res) {
                 await res.json()
                 toast.success("Info Updated Successfully!")
-            }else {
+
+                setUser({
+                    plans: user?.plans ?? [],
+                    personinfo: {
+                        age: data.age,
+                        gender: data.gender,
+                        weight: data.weight,
+                        height: data.height
+                    }
+                })
+            } else {
                 toast.error("Service Unavailable")
             }
-        }catch(error) {
+        } catch (error) {
             console.log(error)
-        }finally {
+        } finally {
             setIsLoading(false)
         }
     }
@@ -127,7 +137,7 @@ const AccountForm = ({ username }: AccountFormProps) => {
 
     return (
         <div className="p-8">
-            <Button onClick={handleBack} variant={"ghost"} className="mb-4"><ArrowLeftIcon/> Back</Button>
+            <Button onClick={handleBack} variant={"ghost"} className="mb-4"><ArrowLeftIcon /> Back</Button>
             <div className="p-4 bg-white border rounded-2xl">
                 <h1 className="text-lg font-semibold">Personal Information</h1>
                 <Form {...form}>
