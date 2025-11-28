@@ -1,7 +1,7 @@
-import HomeHeader from "./components/HomeHeader";
-import HomeBody from "./components/HomeBody";
 import { getCurrentUser } from "@/lib/session";
+import HomeHeader from "../components/HomeHeader";
 import { redirect } from "next/navigation";
+import AccountForm from "./components/AccountForm";
 
 const Page = async () => {
     const username = await getCurrentUser()
@@ -9,11 +9,10 @@ const Page = async () => {
     if (!username) {
         redirect("/login")
     }
-
     return (
         <div className="flex flex-col min-h-screen overflow-hidden max-w-md mx-auto">
             <HomeHeader />
-            <HomeBody username={username} />
+            <AccountForm username={username}/>
         </div>
     );
 }

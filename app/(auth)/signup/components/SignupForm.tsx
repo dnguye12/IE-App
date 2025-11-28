@@ -134,7 +134,7 @@ const SignupForm = () => {
                         </FormItem>
                     )}
                 ></FormField>
-                <Button type="submit" disabled={pending} size={"lg"} className="font-semibold h-14 w-full rounded-full mx-auto text-lg">Signup <ArrowRightIcon /></Button>
+                <Button type="submit" disabled={pending || !form.formState.isValid} size={"lg"} className="font-semibold h-14 w-full rounded-full mx-auto text-lg">Signup <ArrowRightIcon /></Button>
             </form>
         </Form>
     );

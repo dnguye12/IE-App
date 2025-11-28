@@ -1,7 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
+import { User } from "@/lib/types";
 import Image from "next/image";
-import HomeBMIChart from "./HomeBMIChart";
+import Link from "next/link";
 
 const BMI_MIN = 10;
 const BMI_MAX = 40;
@@ -23,8 +25,44 @@ const getPercentage = (value: number) => {
     return ((value - BMI_MIN) / (BMI_MAX - BMI_MIN)) * 100;
 };
 
-const HomeBMI = () => {
-    const clampedBMI = clamp(22, BMI_MIN, BMI_MAX);
+interface HomeBMIProps {
+    user: User | null
+}
+
+const HomeBMI = ({ user }: HomeBMIProps) => {
+    if (!user) {
+        return (
+            <Skeleton className="w-full h-24 rounded-2xl bg-neutral-200" />
+        )
+    }
+
+    if (!user.personinfo || user.personinfo.weight === "" || user.personinfo.height === "") {
+        return (
+            <section>
+                <div className="flex items-center justify-between mb-4">
+                    <h2 className="home-label">BMI</h2>
+                    <Button size={"sm"} variant={"green"} asChild><Link href={"/home/account-setup"}>Edit</Link></Button>
+                </div>
+                <div className="bg-white rounded-2xl p-4 border mb-4 flex flex-col justify-center items-center gap-4">
+                    <Image
+                        src="/rating/neutral.svg"
+                        width={64}
+                        height={64}
+                        alt=""
+                    />
+                    <p className="text-sm font-semibold text-black text-center">You have not set your data yet!</p>
+                    <Button className="font-semibold h-14 w-full rounded-full mx-auto text-lg" asChild>
+                        <Link href={"/home/account-setup"}>Set Up Now!</Link>
+                    </Button>
+                </div>
+            </section>
+        )
+    }
+
+    const weight = parseFloat(user.personinfo.weight)
+    const height = parseFloat(user.personinfo.height)
+    const bmi = Math.round(weight / Math.pow(height * 0.01, 2))
+    const clampedBMI = clamp(bmi, BMI_MIN, BMI_MAX);
     const percentage = ((clampedBMI - BMI_MIN) / (BMI_MAX - BMI_MIN)) * 100;
 
     return (
@@ -33,17 +71,67 @@ const HomeBMI = () => {
                 <h2 className="home-label">BMI</h2>
                 <Button size={"sm"} variant={"green"}>Edit</Button>
             </div>
-            <div className="bg-white rounded-2xl p-4 border mb-4">
+            <div className="bg-white rounded-2xl p-4 border mb-4"></div>
+            <div className="bg-white rounded-2xl p-4 border">
                 <div className="flex items-center justify-between text-black mb-6">
-                    <p className="font-semibold text-3xl">22</p>
+                    <p className="font-semibold text-3xl">{bmi}</p>
                     <div className="inline-flex items-center gap-x-2">
-                        <Image
-                            src="/rating/1.svg"
-                            width={32}
-                            height={32}
-                            alt=""
-                        />
-                        <span className=" font-light text-sm">Healthy weight</span>
+                        {
+                            19 <= bmi && bmi < 25
+                                ?
+                                (
+                                    <>
+                                        <Image
+                                            src="/rating/1.svg"
+                                            width={32}
+                                            height={32}
+                                            alt=""
+                                        />
+                                        <span className=" font-light text-sm">Healthy weight</span>
+                                    </>
+                                )
+                                :
+                                (16 <= bmi && bmi < 19) || (25 <= bmi && bmi < 30)
+                                    ?
+                                    (
+                                        <>
+                                            <Image
+                                                src="/rating/2.svg"
+                                                width={32}
+                                                height={32}
+                                                alt=""
+                                            />
+                                            <span className=" font-light text-sm">{bmi < 19 ? "Underweight" : "Overweight"}</span>
+                                        </>
+                                    )
+                                    :
+                                    (10 <= bmi && bmi < 16) || (30 <= bmi && bmi < 35)
+                                        ?
+                                        (
+                                            <>
+                                                <Image
+                                                    src="/rating/3.svg"
+                                                    width={32}
+                                                    height={32}
+                                                    alt=""
+                                                />
+                                                <span className=" font-light text-sm">{bmi < 16 ? "Severely underweight" : "Obese I"}</span>
+                                            </>
+                                        )
+                                        :
+                                        (
+                                            <>
+                                                <Image
+                                                    src="/rating/4.svg"
+                                                    width={32}
+                                                    height={32}
+                                                    alt=""
+                                                />
+                                                <span className=" font-light text-sm">Obese II</span>
+                                            </>
+                                        )
+                        }
+
                     </div>
                 </div>
                 <div className="relative">
@@ -91,14 +179,17 @@ const HomeBMI = () => {
                         </div>
                     </div>
                 </div>
-                <Separator className="my-4"/>
+                <Separator className="my-4" />
+                <div className="flex items-center justify-between">
+                    <p className="text-muted-foreground font-light">Weight</p>
+                    <p className="text-lg font-semibold text-black">{weight} kg</p>
+                </div>
                 <div className="flex items-center justify-between">
                     <p className="text-muted-foreground font-light">Height</p>
-                    <p className="text-lg font-semibold text-black">165 cm</p>
+                    <p className="text-lg font-semibold text-black">{height} cm</p>
                 </div>
             </div>
 
-            <HomeBMIChart />
         </section>
     );
 }

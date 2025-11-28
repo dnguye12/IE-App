@@ -1,5 +1,4 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { FlameIcon, WeightIcon } from "lucide-react";
 import Image from "next/image";
 import { getCurrentUser } from "@/lib/session";
 import LogoutButton from "@/components/LogoutButton";
@@ -20,7 +19,7 @@ const HomeHeader = async() => {
             </div>
             <div className="flex items-center gap-4">
                 <Avatar className="size-16">
-                    <AvatarImage src="https://i.pravatar.cc/64" />
+                    <AvatarImage src="https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png" />
                     <AvatarFallback>{username}</AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col text-white">
