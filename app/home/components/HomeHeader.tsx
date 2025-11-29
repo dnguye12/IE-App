@@ -19,7 +19,7 @@ const HomeHeader = async() => {
             </div>
             <div className="flex items-center gap-4">
                 <Avatar className="size-16">
-                    <AvatarImage src="https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png" />
+                    <AvatarImage src="/rating/1.svg" />
                     <AvatarFallback>{username}</AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col text-white">

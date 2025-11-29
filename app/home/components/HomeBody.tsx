@@ -59,7 +59,7 @@ const HomeBody = ({ username }: HomeBodyProps) => {
                 <h2 className="home-label mb-4">Generate New Plan</h2>
                 <Button variant={"green"} size={"lg"} className="font-semibold h-14 w-full rounded-full mx-auto text-lg">Generate</Button>
             </section>
-            <HomePlans />
+            <HomePlans username={username} user={user}/>
             <HomeBMI user={user}/>
         </div>
     );

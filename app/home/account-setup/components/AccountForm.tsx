@@ -137,7 +137,7 @@ const AccountForm = ({ username }: AccountFormProps) => {
 
     return (
         <div className="p-8">
-            <Button onClick={handleBack} variant={"ghost"} className="mb-4"><ArrowLeftIcon /> Back</Button>
+            <Button onClick={handleBack} variant={"ghost"} className="mb-4 hover:text-white"><ArrowLeftIcon /> Back</Button>
             <div className="p-4 bg-white border rounded-2xl">
                 <h1 className="text-lg font-semibold">Personal Information</h1>
                 <Form {...form}>
@@ -151,7 +151,7 @@ const AccountForm = ({ username }: AccountFormProps) => {
                                     <FormControl>
                                         <InputGroup className="my-input bg-background! border-border!">
                                             <InputGroupInput
-                                                type="text"
+                                                type="number"
                                                 placeholder="Age"
                                                 disabled={isLoading}
                                                 {...field}
@@ -193,7 +193,7 @@ const AccountForm = ({ username }: AccountFormProps) => {
                                     <FormControl>
                                         <InputGroup className="my-input bg-background! border-border!">
                                             <InputGroupInput
-                                                type="text"
+                                                type="number"
                                                 placeholder="Weight"
                                                 disabled={isLoading}
                                                 {...field}
@@ -212,7 +212,7 @@ const AccountForm = ({ username }: AccountFormProps) => {
                                     <FormControl>
                                         <InputGroup className="my-input bg-background! border-border!">
                                             <InputGroupInput
-                                                type="text"
+                                                type="number"
                                                 placeholder="Height"
                                                 disabled={isLoading}
                                                 {...field}

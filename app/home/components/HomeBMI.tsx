@@ -33,7 +33,13 @@ interface HomeBMIProps {
 const HomeBMI = ({ user }: HomeBMIProps) => {
     if (!user) {
         return (
-            <Skeleton className="w-full h-24 rounded-2xl bg-neutral-200" />
+            <section>
+                <div className="flex items-center justify-between mb-4">
+                    <h2 className="home-label">BMI</h2>
+                    <Button size={"sm"} variant={"green"} disabled>Edit</Button>
+                </div>
+                <Skeleton className="w-full h-24 rounded-2xl bg-neutral-200" />
+            </section>
         )
     }
 
@@ -67,11 +73,11 @@ const HomeBMI = ({ user }: HomeBMIProps) => {
     const clampedBMI = clamp(bmi, BMI_MIN, BMI_MAX);
     const percentage = ((clampedBMI - BMI_MIN) / (BMI_MAX - BMI_MIN)) * 100;
     let tdee
-    if(user.personinfo.gender === "Male") {
+    if (user.personinfo.gender === "Male") {
         tdee = Math.floor((10 * weight) + (6.25 * height) - (5 * age) + 5);
-    }else if(user.personinfo.gender === "Female") {
+    } else if (user.personinfo.gender === "Female") {
         tdee = Math.floor((10 * weight) + (6.25 * height) - (5 * age) - 161);
-    }else {
+    } else {
         tdee = "-- Kcal"
     }
 
