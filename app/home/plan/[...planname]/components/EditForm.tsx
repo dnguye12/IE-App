@@ -34,15 +34,16 @@ const formSchema = z.object({
     )
 })
 
-interface GenerateFormProps {
+interface EditFormProps {
+    planname: string;
     username: string
 }
 
-const GenerateForm = ({ username }: GenerateFormProps) => {
+const EditForm = ({ planname, username }: EditFormProps) => {
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            planname: `Plan-${Math.floor(Math.random() * 2000)}`,
+            planname,
             targetCalories: 2000,
             protein: 30,
             carbs: 50,
@@ -101,61 +102,96 @@ const GenerateForm = ({ username }: GenerateFormProps) => {
         }
     }, [pending, username])
 
+    useEffect(() => {
+        if (planname && username) {
+            const fetchData = async () => {
+                try {
+                    const res = await fetch("/api/get-plan", {
+                        method: "POST",
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            username, planname
+                        })
+                    })
+                    const data = await res.json()
+                    if (data) {
+                        setPlan(data.result)
+                        setRequest(data.dr)
+                        form.reset({
+                            planname,
+                            targetCalories: data.result.inputSummary["Target Calories"],
+                            protein: data.result.nutritionSummary["Protein %"],
+                            carbs: data.result.nutritionSummary["Carbs "],
+                            fats: data.result.nutritionSummary["Fat %"],
+                            wantedFoods: [],
+                            notWantedFoods: []
+                        })
+                    }
+                } catch (error) {
+                    console.log(error)
+                }
+            }
+            fetchData()
+        }
+    }, [planname, username, form])
+
     const onSubmit = async (data: z.infer<typeof formSchema>) => {
-        const existingNames = user?.plans?.map((p) => p.toLowerCase().trim()) ?? []
-        const helper = data.planname.toLowerCase().trim()
-
-        if (existingNames.includes(helper)) {
-            form.setError("planname", {
-                type: "manual",
-                message: "You already have a plan with this name",
-            })
-
-            toast.error("You already have a plan with this name")
-            return
+            const existingNames = user?.plans?.map((p) => p.toLowerCase().trim()) ?? []
+            const helper = data.planname.toLowerCase().trim()
+    
+            if (existingNames.includes(helper)) {
+                form.setError("planname", {
+                    type: "manual",
+                    message: "You already have a plan with this name",
+                })
+    
+                toast.error("You already have a plan with this name")
+                return
+            }
+            try {
+                setPending(true)
+    
+                const macros = {
+                    protein: data.protein,
+                    carbs: data.carbs,
+                    fats: data.fats
+                }
+    
+                const request = {
+                    username,
+                    planname: data.planname,
+                    targetCalories: data.targetCalories,
+                    foods: data.wantedFoods,
+                    notWantedFoods: data.notWantedFoods.map((n) => n.name),
+                    macros
+                }
+    
+                setRequest(request)
+                const res = await fetch("/api/generate-plan", {
+                    method: "POST",
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(request)
+                })
+    
+                if (res) {
+                    const data = await res.json()
+                    setPlan(data)
+                } else {
+                    toast.error("Service Unavailable")
+                }
+            } catch (error) {
+                console.log(error)
+            } finally {
+                setPending(false)
+            }
         }
-        try {
-            setPending(true)
-
-            const macros = {
-                protein: data.protein,
-                carbs: data.carbs,
-                fats: data.fats
-            }
-
-            const request = {
-                username,
-                planname: data.planname,
-                targetCalories: data.targetCalories,
-                foods: data.wantedFoods,
-                notWantedFoods: data.notWantedFoods.map((n) => n.name),
-                macros
-            }
-
-            setRequest(request)
-            const res = await fetch("/api/generate-plan", {
-                method: "POST",
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(request)
-            })
-
-            if (res) {
-                const data = await res.json()
-                setPlan(data)
-            } else {
-                toast.error("Service Unavailable")
-            }
-        } catch (error) {
-            console.log(error)
-        } finally {
-            setPending(false)
-        }
-    }
 
     const onSave = async () => {
-        if(!user) {
+        if (!user) {
             return
         }
         try {
@@ -173,7 +209,7 @@ const GenerateForm = ({ username }: GenerateFormProps) => {
             })
 
             const data = await res.json()
-            if(data) {
+            if (data) {
                 setUser({
                     plans: [...user.plans, request.planname],
                     personinfo: user.personinfo
@@ -438,7 +474,7 @@ const GenerateForm = ({ username }: GenerateFormProps) => {
                     </TableHeader>
                     {plan && (
                         <TableBody>
-                            {plan?.plan?.map((p: any, idx: number) => (
+                            {plan.plan.map((p: any, idx: number) => (
                                 <TableRow key={`plan-${idx}`} className="font-light">
                                     <TableCell>{p.name} {p.isAutoAdded && "(Auto)"}</TableCell>
                                     <TableCell>{p.grams}</TableCell>
@@ -467,7 +503,7 @@ const GenerateForm = ({ username }: GenerateFormProps) => {
                     variant={"green"}
                     size={"lg"}
                     className="rounded-full w-full"
-                    disabled={pending || !plan ||!request}
+                    disabled={pending || !plan || !request}
                     onClick={onSave}
                 >Save Plan To Database</Button>
             </div>
@@ -475,4 +511,4 @@ const GenerateForm = ({ username }: GenerateFormProps) => {
     );
 }
 
-export default GenerateForm;
+export default EditForm;

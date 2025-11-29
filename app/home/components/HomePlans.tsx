@@ -64,12 +64,15 @@ const HomePlans = ({ username, user }: HomePlansProps) => {
                     (
                         <>
                             {user.plans.map((plan, idx) => (
-                                <Link href={`/home/plan/${plan}`} key={`plan-${idx}`} className={cn(
+                                <div key={`plan-${idx}`} className={cn(
                                     "rounded-2xl w-full p-4 gap-x-4 hover:scale-105 transition-transform cursor-pointer hover:shadow-md min-h-20",
                                     idx % 2 === 0 ? "bg-accent" : "bg-green"
                                 )} >
-                                    <div className="flex items-center justify-between mb-2">
-                                        <h5 className="text-white font-semibold text-xl">{plan}</h5>
+                                    <div className="flex items-start justify-between mb-2">
+                                        <Link href={`/home/plan/${plan}`} className="flex flex-col justify-between">
+                                            <h5 className="text-white font-semibold text-xl">{plan}</h5>
+                                            <p className="text-neutral-100 text-sm font-light">Click to view details</p>
+                                        </Link>
                                         <AlertDialog>
                                             <AlertDialogTrigger asChild>
                                                 <Button size={"icon-sm"} variant={"outline"} className="hover:bg-neutral-200"><TrashIcon /></Button>
@@ -89,8 +92,8 @@ const HomePlans = ({ username, user }: HomePlansProps) => {
                                         </AlertDialog>
 
                                     </div>
-                                    <p className="text-neutral-100 text-sm font-light">Click to view details</p>
-                                </Link>
+
+                                </div>
                             ))}
                         </>
                     )

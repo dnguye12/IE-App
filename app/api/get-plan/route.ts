@@ -2,16 +2,17 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
     const body = await req.json()
-    const { username, planname, targetCalories, foods, notWantedFoods, macros } = body
+    const { username, planname } = body
 
     try {
-        const data = await fetch(`${process.env.NEXT_PUBLIC_BACKEND}/api/generate-plan`, {
+        const data = await fetch(`${process.env.NEXT_PUBLIC_BACKEND}/api/get-plan`, {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                username, planname, targetCalories, foods, notWantedFoods, macros
+                planname,
+                username
             })
         })
         const data2 = await data.json()
