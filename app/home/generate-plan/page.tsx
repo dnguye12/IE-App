@@ -10,7 +10,7 @@ const Page = async () => {
         redirect("/login")
     }
     return (
-        <div className="flex flex-col min-h-screen overflow-hidden max-w-md mx-auto">
+        <div className="flex flex-col min-h-screen overflow-hidden max-w-md md:max-w-5xl mx-auto">
             <HomeHeader />
             <GenerateForm username={username}/>
         </div>

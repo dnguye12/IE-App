@@ -192,10 +192,11 @@ const GenerateForm = ({ username }: GenerateFormProps) => {
     }
 
     return (
-        <div className="flex-1 p-8">
+        <div className="flex-1 p-8 md:px-0">
             <Button onClick={handleBack} variant={"ghost"} className="mb-4 hover:text-white"><ArrowLeftIcon /> Back</Button>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                     <div className="rounded-2xl bg-white border p-4 space-y-6">
                         <FormField
                             name="planname"
@@ -414,7 +415,7 @@ const GenerateForm = ({ username }: GenerateFormProps) => {
                     </div>
                 </form>
             </Form>
-            <div className="rounded-2xl bg-white border p-4 space-y-6 mt-6">
+            <div className="md:col-span-2 rounded-2xl bg-white border p-4 space-y-6">
                 <div className="flex flex-col sm:flex-row items-start justify-between gap-1">
                     <h5 className="font-semibold">Plan Result</h5>
                     {plan?.nutritionSummary && (
@@ -470,6 +471,7 @@ const GenerateForm = ({ username }: GenerateFormProps) => {
                     disabled={pending || !plan ||!request}
                     onClick={onSave}
                 >Save Plan To Database</Button>
+            </div>
             </div>
         </div>
     );

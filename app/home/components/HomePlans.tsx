@@ -19,7 +19,7 @@ const HomePlans = ({ username, user }: HomePlansProps) => {
                     <h2 className="home-label">Your Plans</h2>
                     <Button size={"sm"} variant={"green"} disabled>Generate</Button>
                 </div>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                     <Skeleton className="h-20 bg-neutral-200" />
                     <Skeleton className="h-20 bg-neutral-200" />
                     <Skeleton className="h-20 bg-neutral-200" />
@@ -57,7 +57,7 @@ const HomePlans = ({ username, user }: HomePlansProps) => {
                     <Link href={"/home/generate-plan"}>Generate</Link>
                 </Button>
             </div>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                 {
                     user && user.plans?.length > 0
                     &&

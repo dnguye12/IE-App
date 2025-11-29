@@ -6,7 +6,7 @@ import { ArrowRightIcon } from "lucide-react";
 
 export default function Home() {
   return (
-    <div className="flex flex-col h-screen overflow-hidden p-8 max-w-md mx-auto">
+    <div className="flex flex-col h-screen overflow-hidden p-8 md:px-0 max-w-md mx-auto">
       <header className="flex justify-center">
         <Logo />
       </header>

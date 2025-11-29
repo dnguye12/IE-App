@@ -53,7 +53,7 @@ const HomeBody = ({ username }: HomeBodyProps) => {
     }, [isLoading, username])
 
     return (
-        <div className="flex-1 flex flex-col p-8 gap-12">
+        <div className="flex-1 flex flex-col p-8 md:px-0 gap-12">
             <HomePlans username={username} user={user}/>
             <HomeBMI user={user}/>
         </div>

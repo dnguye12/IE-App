@@ -87,131 +87,132 @@ const HomeBMI = ({ user }: HomeBMIProps) => {
                 <h2 className="home-label">BMI</h2>
                 <Button size={"sm"} variant={"green"} asChild><Link href={"/home/account-setup"}>Edit</Link></Button>
             </div>
-            <div className="bg-white text-black rounded-2xl p-4 border mb-4 flex flex-col justify-between gap-y-16">
-                <DrumstickIcon className="min-w-8 size-8" />
-                <div>
-                    <p className="font-semibold text-xl"><span className="text-2xl">{tdee}</span> Kcal</p>
-                    <p className="text-muted-foreground text-sm font-light">Recommended Daily Calories (TDEE)</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-white text-black rounded-2xl p-4 border flex flex-col justify-between gap-y-16">
+                    <DrumstickIcon className="min-w-8 size-8" />
+                    <div>
+                        <p className="font-semibold text-xl"><span className="text-2xl">{tdee}</span> Kcal</p>
+                        <p className="text-muted-foreground text-sm font-light">Recommended Daily Calories (TDEE)</p>
+                    </div>
                 </div>
-            </div>
-            <div className="bg-white rounded-2xl p-4 border">
-                <div className="flex items-center justify-between text-black mb-6">
-                    <p className="font-semibold text-3xl">{bmi}</p>
-                    <div className="inline-flex items-center gap-x-2">
-                        {
-                            19 <= bmi && bmi < 25
-                                ?
-                                (
-                                    <>
-                                        <Image
-                                            src="/rating/1.svg"
-                                            width={32}
-                                            height={32}
-                                            alt=""
-                                        />
-                                        <span className=" font-light text-sm">Healthy weight</span>
-                                    </>
-                                )
-                                :
-                                (16 <= bmi && bmi < 19) || (25 <= bmi && bmi < 30)
+                <div className="bg-white rounded-2xl p-4 border">
+                    <div className="flex items-center justify-between text-black mb-6">
+                        <p className="font-semibold text-3xl">{bmi}</p>
+                        <div className="inline-flex items-center gap-x-2">
+                            {
+                                19 <= bmi && bmi < 25
                                     ?
                                     (
                                         <>
                                             <Image
-                                                src="/rating/2.svg"
+                                                src="/rating/1.svg"
                                                 width={32}
                                                 height={32}
                                                 alt=""
                                             />
-                                            <span className=" font-light text-sm">{bmi < 19 ? "Underweight" : "Overweight"}</span>
+                                            <span className=" font-light text-sm">Healthy weight</span>
                                         </>
                                     )
                                     :
-                                    (10 <= bmi && bmi < 16) || (30 <= bmi && bmi < 35)
+                                    (16 <= bmi && bmi < 19) || (25 <= bmi && bmi < 30)
                                         ?
                                         (
                                             <>
                                                 <Image
-                                                    src="/rating/3.svg"
+                                                    src="/rating/2.svg"
                                                     width={32}
                                                     height={32}
                                                     alt=""
                                                 />
-                                                <span className=" font-light text-sm">{bmi < 16 ? "Severely underweight" : "Obese I"}</span>
+                                                <span className=" font-light text-sm">{bmi < 19 ? "Underweight" : "Overweight"}</span>
                                             </>
                                         )
                                         :
-                                        (
-                                            <>
-                                                <Image
-                                                    src="/rating/4.svg"
-                                                    width={32}
-                                                    height={32}
-                                                    alt=""
-                                                />
-                                                <span className=" font-light text-sm">Obese II</span>
-                                            </>
-                                        )
-                        }
+                                        (10 <= bmi && bmi < 16) || (30 <= bmi && bmi < 35)
+                                            ?
+                                            (
+                                                <>
+                                                    <Image
+                                                        src="/rating/3.svg"
+                                                        width={32}
+                                                        height={32}
+                                                        alt=""
+                                                    />
+                                                    <span className=" font-light text-sm">{bmi < 16 ? "Severely underweight" : "Obese I"}</span>
+                                                </>
+                                            )
+                                            :
+                                            (
+                                                <>
+                                                    <Image
+                                                        src="/rating/4.svg"
+                                                        width={32}
+                                                        height={32}
+                                                        alt=""
+                                                    />
+                                                    <span className=" font-light text-sm">Obese II</span>
+                                                </>
+                                            )
+                            }
 
-                    </div>
-                </div>
-                <div className="relative">
-                    <div className="flex h-3 overflow-hidden gap-0.5">
-                        {BMI_SEGMENTS.map((seg, index) => {
-                            const width = (seg.to - seg.from) / (BMI_MAX - BMI_MIN);
-                            return (
-                                <div
-                                    key={index}
-                                    className={`${seg.color} rounded-sm`}
-                                    style={{ flex: width }}
-                                    title={`${seg.label} (${seg.from} – ${seg.to})`}
-                                />
-                            );
-                        })}
-                    </div>
-                    <div
-                        className="pointer-events-none absolute -top-2 flex flex-col items-center"
-                        style={{ left: `${percentage}%`, transform: "translateX(-50%)" }}
-                    >
-                        <div
-                            className="border-x-[6px] border-t-8 border-x-transparent border-t-black"
-                            style={{ width: 0, height: 0 }}
-                        />
-                    </div>
-                    <div className="mt-1 h-4 relative text-xs text-muted-foreground">
-                        {BMI_SEGMENTS.map((seg, index) => {
-                            const startPercent = getPercentage(seg.from);
-                            return (
-                                <div
-                                    key={index}
-                                    className="absolute -translate-x-1/2 ps-3"
-                                    style={{ left: `${startPercent}%` }}
-                                >
-                                    {seg.from}
-                                </div>
-                            );
-                        })}
-
-                        <div
-                            className="absolute -translate-x-1/2 pr-3"
-                            style={{ left: "100%" }}
-                        >
-                            {BMI_MAX}
                         </div>
                     </div>
-                </div>
-                <Separator className="my-4" />
-                <div className="flex items-center justify-between">
-                    <p className="text-muted-foreground font-light">Weight</p>
-                    <p className="text-lg font-semibold text-black">{weight} kg</p>
-                </div>
-                <div className="flex items-center justify-between">
-                    <p className="text-muted-foreground font-light">Height</p>
-                    <p className="text-lg font-semibold text-black">{height} cm</p>
+                    <div className="relative">
+                        <div className="flex h-3 overflow-hidden gap-0.5">
+                            {BMI_SEGMENTS.map((seg, index) => {
+                                const width = (seg.to - seg.from) / (BMI_MAX - BMI_MIN);
+                                return (
+                                    <div
+                                        key={index}
+                                        className={`${seg.color} rounded-sm`}
+                                        style={{ flex: width }}
+                                        title={`${seg.label} (${seg.from} – ${seg.to})`}
+                                    />
+                                );
+                            })}
+                        </div>
+                        <div
+                            className="pointer-events-none absolute -top-2 flex flex-col items-center"
+                            style={{ left: `${percentage}%`, transform: "translateX(-50%)" }}
+                        >
+                            <div
+                                className="border-x-[6px] border-t-8 border-x-transparent border-t-black"
+                                style={{ width: 0, height: 0 }}
+                            />
+                        </div>
+                        <div className="mt-1 h-4 relative text-xs text-muted-foreground">
+                            {BMI_SEGMENTS.map((seg, index) => {
+                                const startPercent = getPercentage(seg.from);
+                                return (
+                                    <div
+                                        key={index}
+                                        className="absolute -translate-x-1/2 ps-3"
+                                        style={{ left: `${startPercent}%` }}
+                                    >
+                                        {seg.from}
+                                    </div>
+                                );
+                            })}
+
+                            <div
+                                className="absolute -translate-x-1/2 pr-3"
+                                style={{ left: "100%" }}
+                            >
+                                {BMI_MAX}
+                            </div>
+                        </div>
+                    </div>
+                    <Separator className="my-4" />
+                    <div className="flex items-center justify-between">
+                        <p className="text-muted-foreground font-light">Weight</p>
+                        <p className="text-lg font-semibold text-black">{weight} kg</p>
+                    </div>
+                    <div className="flex items-center justify-between">
+                        <p className="text-muted-foreground font-light">Height</p>
+                        <p className="text-lg font-semibold text-black">{height} cm</p>
+                    </div>
                 </div>
             </div>
-
         </section>
     );
 }

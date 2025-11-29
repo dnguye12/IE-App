@@ -136,7 +136,7 @@ const AccountForm = ({ username }: AccountFormProps) => {
     }
 
     return (
-        <div className="p-8">
+        <div className="p-8 md:px-0">
             <Button onClick={handleBack} variant={"ghost"} className="mb-4 hover:text-white"><ArrowLeftIcon /> Back</Button>
             <div className="p-4 bg-white border rounded-2xl">
                 <h1 className="text-lg font-semibold">Personal Information</h1>
