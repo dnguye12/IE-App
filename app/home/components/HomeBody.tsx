@@ -1,6 +1,5 @@
 "use client"
 
-import { Button } from "@/components/ui/button";
 import HomeBMI from "./HomeBMI";
 import HomePlans from "./HomePlans";
 import { useEffect, useState } from "react";
@@ -55,10 +54,6 @@ const HomeBody = ({ username }: HomeBodyProps) => {
 
     return (
         <div className="flex-1 flex flex-col p-8 gap-12">
-            <section>
-                <h2 className="home-label mb-4">Generate New Plan</h2>
-                <Button variant={"green"} size={"lg"} className="font-semibold h-14 w-full rounded-full mx-auto text-lg">Generate</Button>
-            </section>
             <HomePlans username={username} user={user}/>
             <HomeBMI user={user}/>
         </div>

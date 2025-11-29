@@ -1,0 +1,20 @@
+import { getCurrentUser } from "@/lib/session";
+import { redirect } from "next/navigation";
+import HomeHeader from "../components/HomeHeader";
+import GenerateForm from "./components/GenerateForm";
+
+const Page = async () => {
+    const username = await getCurrentUser()
+
+    if (!username) {
+        redirect("/login")
+    }
+    return (
+        <div className="flex flex-col min-h-screen overflow-hidden max-w-md mx-auto">
+            <HomeHeader />
+            <GenerateForm username={username}/>
+        </div>
+    );
+}
+
+export default Page;

@@ -3,7 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { User } from "@/lib/types";
 import { cn } from "@/lib/utils";
-import { TrashIcon } from "lucide-react";
+import { PlusIcon, TrashIcon } from "lucide-react";
+import Link from "next/link";
 
 interface HomePlansProps {
     username: string;
@@ -52,16 +53,19 @@ const HomePlans = ({ username, user }: HomePlansProps) => {
         <section>
             <div className="flex items-center justify-between mb-4">
                 <h2 className="home-label">Your Plans</h2>
-                <Button size={"sm"} variant={"green"}>Generate</Button>
+                <Button size={"sm"} variant={"green"} asChild>
+                    <Link href={"/home/generate-plan"}>Generate</Link>
+                </Button>
             </div>
-            {
-                user.plans?.length > 0
-                    ?
+            <div className="grid grid-cols-2 gap-2">
+                {
+                    user && user.plans?.length > 0
+                    &&
                     (
-                        <div className="grid grid-cols-2 gap-2">
+                        <>
                             {user.plans.map((plan, idx) => (
-                                <div key={`plan-${idx}`} className={cn(
-                                    "rounded-2xl w-full p-4 gap-x-4 hover:scale-105 transition-transform cursor-pointer hover:shadow-md",
+                                <Link href={`/home/plan/${plan}`} key={`plan-${idx}`} className={cn(
+                                    "rounded-2xl w-full p-4 gap-x-4 hover:scale-105 transition-transform cursor-pointer hover:shadow-md min-h-20",
                                     idx % 2 === 0 ? "bg-accent" : "bg-green"
                                 )} >
                                     <div className="flex items-center justify-between mb-2">
@@ -86,16 +90,15 @@ const HomePlans = ({ username, user }: HomePlansProps) => {
 
                                     </div>
                                     <p className="text-neutral-100 text-sm font-light">Click to view details</p>
-                                </div>
+                                </Link>
                             ))}
-                        </div>
+                        </>
                     )
-                    :
-                    (
-                        <div className="grid grid-cols-2 gap-2"></div>
-                    )
-            }
-
+                }
+                <Link href={"/home/generate-plan"} className="rounded-2xl w-full p-4 gap-x-4 hover:scale-105 transition-transform cursor-pointer hover:shadow-md min-h-20 bg-white flex justify-center items-center border-2 border-dashed">
+                    <PlusIcon className="size-8 min-w-8 text-black" />
+                </Link>
+            </div>
         </section>
     );
 }
