@@ -17,14 +17,14 @@ import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
     planname: z.string().trim().min(1, "Plan name is required and be unique"),
-    targetCalories: z.number(),
-    protein: z.number(),
-    carbs: z.number(),
-    fats: z.number(),
+    targetCalories: z.coerce.number(),
+    protein: z.coerce.number(),
+    carbs: z.coerce.number(),
+    fats: z.coerce.number(),
     wantedFoods: z.array(
         z.object({
             foodNames: z.string().trim().min(1, "Food name is required"),
-            foodQuantity: z.number().min(1, "Quantity is required")
+            foodQuantity: z.coerce.number().min(1, "Quantity is required")
         })
     ),
     notWantedFoods: z.array(
