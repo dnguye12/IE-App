@@ -13,7 +13,7 @@ const Page = async () => {
   return (
     <div className="flex flex-col h-screen overflow-hidden max-w-md mx-auto">
       <div className="relative z-0 h-40">
-        <div className=" w-[960px] h-[960px] bg-green rounded-full absolute -top-8 md:-top-80 left-1/2 -translate-1/2 z-0"></div>
+        <div className=" w-[960px] h-[960px] bg-green rounded-full absolute -top-80 left-1/2 -translate-1/2 z-0"></div>
         <Image
           src={"/logo.svg"}
           width={80}

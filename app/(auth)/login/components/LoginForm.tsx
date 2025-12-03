@@ -32,7 +32,7 @@ const LoginForm = () => {
     const onSubmit = async (data: z.infer<typeof formSchema>) => {
         try {
             setPending(true)
-            const res = await fetch("/api/login", {
+            const res = await fetch("/api/v2/login", {
                 method: "POST",
                 headers: {
                     'Content-Type': 'application/json',
@@ -53,7 +53,7 @@ const LoginForm = () => {
                         router.push("/home")
                     }
                 } else {
-                    toast.error(resJson.sign)
+                    toast.error(resJson.message)
                 }
             } else {
                 toast.error("Service Unavailable")

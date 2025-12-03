@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -31,8 +32,8 @@ const HomePlans = ({ username, user }: HomePlansProps) => {
 
     const handleDelete = async (username: string, planname: string) => {
         try {
-            const res = await fetch("/api/delete-plan", {
-                method: "POST",
+            const res = await fetch("/api/v2/delete-plan", {
+                method: "DELETE",
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -63,14 +64,14 @@ const HomePlans = ({ username, user }: HomePlansProps) => {
                     &&
                     (
                         <>
-                            {user.plans.map((plan, idx) => (
+                            {user.plans.map((plan: any, idx) => (
                                 <div key={`plan-${idx}`} className={cn(
                                     "rounded-2xl w-full p-4 gap-x-4 hover:scale-105 transition-transform cursor-pointer hover:shadow-md min-h-20",
                                     idx % 2 === 0 ? "bg-accent" : "bg-green"
                                 )} >
                                     <div className="flex items-start justify-between mb-2">
-                                        <Link href={`/home/plan/${plan}`} className="flex flex-col justify-between">
-                                            <h5 className="text-white font-semibold text-xl">{plan}</h5>
+                                        <Link href={`/home/plan/${plan.planname}`} className="flex flex-col justify-between">
+                                            <h5 className="text-white font-semibold text-xl">{plan.planname}</h5>
                                             <p className="text-neutral-100 text-sm font-light">Click to view details</p>
                                         </Link>
                                         <AlertDialog>
@@ -86,7 +87,7 @@ const HomePlans = ({ username, user }: HomePlansProps) => {
                                                 </AlertDialogHeader>
                                                 <AlertDialogFooter>
                                                     <AlertDialogCancel className="hover:text-white">Cancel</AlertDialogCancel>
-                                                    <AlertDialogAction onClick={() => handleDelete(username, plan)}>Continue</AlertDialogAction>
+                                                    <AlertDialogAction onClick={() => handleDelete(username, plan.planname)}>Continue</AlertDialogAction>
                                                 </AlertDialogFooter>
                                             </AlertDialogContent>
                                         </AlertDialog>

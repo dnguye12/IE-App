@@ -17,15 +17,7 @@ const HomeBody = ({ username }: HomeBodyProps) => {
         if (isLoading) {
             const fetchData = async () => {
                 try {
-                    const res = await fetch("/api/homepage", {
-                        method: "POST",
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            username
-                        }),
-                    })
+                    const res = await fetch(`/api/v2/homepage?username=${username}`)
 
                     const data = await res.json()
                     if (!data) {

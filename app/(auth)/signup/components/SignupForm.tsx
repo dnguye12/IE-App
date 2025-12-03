@@ -9,6 +9,7 @@ import { ArrowRightIcon, LockKeyholeIcon, MailIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
     username: z.string().trim().min(4, "Username is required and at least 4 characters long"),
@@ -18,6 +19,7 @@ const formSchema = z.object({
 
 const SignupForm = () => {
     const [pending, setPending] = useState<boolean>(false)
+    const router = useRouter()
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -31,7 +33,7 @@ const SignupForm = () => {
     const onSubmit = async (data: z.infer<typeof formSchema>) => {
         try {
             setPending(true)
-            const res = await fetch("/api/create-account", {
+            const res = await fetch("/api/v2/create-account", {
                 method: "POST",
                 headers: {
                     'Content-Type': 'application/json',
@@ -48,8 +50,9 @@ const SignupForm = () => {
                 if(data.code === 4) {
                     toast.success("Account created successfully! Please login.")
                     form.reset()
+                    router.push("/login")
                 }else {
-                    toast.error(data.sign)
+                    toast.error(data.message)
                 }
             }else {
                 toast.error("Service Unavailable")
@@ -134,7 +137,7 @@ const SignupForm = () => {
                         </FormItem>
                     )}
                 ></FormField>
-                <Button type="submit" disabled={pending || !form.formState.isValid} size={"lg"} className="font-semibold h-14 w-full rounded-full mx-auto text-lg">Signup <ArrowRightIcon /></Button>
+                <Button type="submit" disabled={pending} size={"lg"} className="font-semibold h-14 w-full rounded-full mx-auto text-lg">Signup <ArrowRightIcon /></Button>
             </form>
         </Form>
     );

@@ -67,15 +67,7 @@ const EditForm = ({ planname, username }: EditFormProps) => {
             const fetchData = async () => {
                 setPending(true)
                 try {
-                    const res = await fetch("/api/homepage", {
-                        method: "POST",
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            username
-                        }),
-                    })
+                    const res = await fetch(`/api/v2/homepage?username=${username}`)
 
                     const data = await res.json()
                     if (!data) {
@@ -106,16 +98,9 @@ const EditForm = ({ planname, username }: EditFormProps) => {
         if (planname && username) {
             const fetchData = async () => {
                 try {
-                    const res = await fetch("/api/get-plan", {
-                        method: "POST",
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            username, planname
-                        })
-                    })
+                    const res = await fetch(`/api/v2/get-plan?username=${username}&planname=${planname}`)
                     const data = await res.json()
+
                     if (data) {
                         setPlan(data.result)
                         setRequest(data.dr)
@@ -128,6 +113,18 @@ const EditForm = ({ planname, username }: EditFormProps) => {
                             wantedFoods: [],
                             notWantedFoods: []
                         })
+
+                        if(data.dr.foods?.length > 0) {
+                            for(const food of data.dr.foods) {
+                                wantedField.append(food)
+                            }
+                        }
+
+                        if(data.dr.notWantedFoods?.length > 0) {
+                            for(const food of data.dr.notWantedFoods) {
+                                notWantedField.append({name: food})
+                            }
+                        }
                     }
                 } catch (error) {
                     console.log(error)
@@ -138,18 +135,6 @@ const EditForm = ({ planname, username }: EditFormProps) => {
     }, [planname, username, form])
 
     const onSubmit = async (data: z.infer<typeof formSchema>) => {
-        const existingNames = user?.plans?.map((p) => p.toLowerCase().trim()) ?? []
-        const helper = data.planname.toLowerCase().trim()
-
-        if (existingNames.includes(helper)) {
-            form.setError("planname", {
-                type: "manual",
-                message: "You already have a plan with this name",
-            })
-
-            toast.error("You already have a plan with this name")
-            return
-        }
         try {
             setPending(true)
 
@@ -169,7 +154,7 @@ const EditForm = ({ planname, username }: EditFormProps) => {
             }
 
             setRequest(request)
-            const res = await fetch("/api/generate-plan", {
+            const res = await fetch("/api/v2/generate-plan", {
                 method: "POST",
                 headers: {
                     'Content-Type': 'application/json',
@@ -195,7 +180,7 @@ const EditForm = ({ planname, username }: EditFormProps) => {
             return
         }
         try {
-            const res = await fetch("/api/save-plan", {
+            const res = await fetch("/api/v2/save-plan", {
                 method: "POST",
                 headers: {
                     'Content-Type': 'application/json',
@@ -456,9 +441,10 @@ const EditForm = ({ planname, username }: EditFormProps) => {
                         <h5 className="font-semibold">Plan Result</h5>
                         {plan?.nutritionSummary && (
                             <div className="flex gap-x-2">
-                                <div className="text-xs rounded-full bg-blue-200/50 text-blue-700 p-1">Protein: {plan.nutritionSummary['Total Protein (g)']}</div>
-                                <div className="text-xs rounded-full bg-blue-200/50 text-blue-700 p-1">Carbs: {plan.nutritionSummary['Total Carbs (g)']}</div>
-                                <div className="text-xs rounded-full bg-blue-200/50 text-blue-700 p-1">Fats: {plan.nutritionSummary['Total Fat (g)']}</div>
+                                 <div className="text-xs rounded-full bg-blue-200/50 text-blue-700 p-1">Calorie: {Math.floor(plan.nutritionSummary.totalCalories)}</div>
+                                <div className="text-xs rounded-full bg-blue-200/50 text-blue-700 p-1">Protein: {Math.floor(plan.nutritionSummary.totalProtein)}</div>
+                                <div className="text-xs rounded-full bg-blue-200/50 text-blue-700 p-1">Carbs: {Math.floor(plan.nutritionSummary.totalCarbs)}</div>
+                                <div className="text-xs rounded-full bg-blue-200/50 text-blue-700 p-1">Fats: {Math.floor(plan.nutritionSummary.totalFat)}</div>
                             </div>
                         )}
                     </div>
@@ -478,11 +464,11 @@ const EditForm = ({ planname, username }: EditFormProps) => {
                                 {plan.plan.map((p: any, idx: number) => (
                                     <TableRow key={`plan-${idx}`} className="font-light">
                                         <TableCell>{p.name} {p.isAutoAdded && "(Auto)"}</TableCell>
-                                        <TableCell>{p.grams}</TableCell>
-                                        <TableCell>{Math.floor(p.totalCalories)}</TableCell>
-                                        <TableCell>{Math.floor(p.totalProteinGrams)}</TableCell>
-                                        <TableCell>{Math.floor(p.totalCarbsGrams)}</TableCell>
-                                        <TableCell>{Math.floor(p.totalFatGrams)}</TableCell>
+                                        <TableCell>{Math.floor(p.grams)}</TableCell>
+                                        <TableCell>{Math.floor(p.calories * p.grams / 100)}</TableCell>
+                                        <TableCell>{Math.floor(p.protein * p.grams / 100)}</TableCell>
+                                        <TableCell>{Math.floor(p.carbs * p.grams / 100)}</TableCell>
+                                        <TableCell>{Math.floor(p.fats * p.grams / 100)}</TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>

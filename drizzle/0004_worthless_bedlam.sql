@@ -1,0 +1,1 @@
+ALTER TABLE "food_data" ALTER COLUMN "category" DROP NOT NULL;

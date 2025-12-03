@@ -1,0 +1,1 @@
+ALTER TABLE "food_data" DROP COLUMN "grams";

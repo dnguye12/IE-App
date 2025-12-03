@@ -3,7 +3,7 @@
 import { z } from "zod";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { InputGroup, InputGroupInput } from "@/components/ui/input-group";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
@@ -94,8 +94,8 @@ const AccountForm = ({ username }: AccountFormProps) => {
     const onSubmit = async (data: z.infer<typeof formSchema>) => {
         try {
             setIsLoading(true)
-            const res = await fetch("/api/person", {
-                method: "POST",
+            const res = await fetch("/api/v2/person", {
+                method: "PATCH",
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -158,6 +158,7 @@ const AccountForm = ({ username }: AccountFormProps) => {
                                             />
                                         </InputGroup>
                                     </FormControl>
+                                    <FormMessage />
                                 </FormItem>
                             )}
                         ></FormField>
@@ -200,6 +201,7 @@ const AccountForm = ({ username }: AccountFormProps) => {
                                             />
                                         </InputGroup>
                                     </FormControl>
+                                    <FormMessage />
                                 </FormItem>
                             )}
                         ></FormField>
@@ -219,10 +221,11 @@ const AccountForm = ({ username }: AccountFormProps) => {
                                             />
                                         </InputGroup>
                                     </FormControl>
+                                    <FormMessage />
                                 </FormItem>
                             )}
                         ></FormField>
-                        <Button type="submit" disabled={isLoading || !form.formState.isValid} size={"lg"} variant={"green"} className="font-semibold h-14 w-full rounded-full mx-auto text-lg">Update Info</Button>
+                        <Button type="submit" disabled={isLoading} size={"lg"} variant={"green"} className="font-semibold h-14 w-full rounded-full mx-auto text-lg">Update Info</Button>
                     </form>
                 </Form>
             </div>
