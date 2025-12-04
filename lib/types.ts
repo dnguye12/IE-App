@@ -4,6 +4,8 @@ export interface User {
         age: string,
         gender: string,
         weight: string,
-        height: string
+        height: string,
+        kcal: string,
+        activity: string
     }
 } 

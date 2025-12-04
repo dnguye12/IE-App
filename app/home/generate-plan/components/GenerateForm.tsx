@@ -76,7 +76,9 @@ const GenerateForm = ({ username }: GenerateFormProps) => {
                                 age: "",
                                 gender: "",
                                 weight: "",
-                                height: ""
+                                height: "",
+                                kcal: "",
+                                activity: ""
                             }
                         })
                     } else {
@@ -165,7 +167,7 @@ const GenerateForm = ({ username }: GenerateFormProps) => {
                 toast.error(data.message)
                 form.setError("planname", {
                     type: "value",
-                message: "You already have this plan name"
+                    message: "You already have this plan name"
                 })
             } else {
                 const data = await res.json()

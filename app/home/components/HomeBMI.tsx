@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { User } from "@/lib/types";
+import { caltdee, getPercentage } from "@/utils/utils";
 import { DrumstickIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -18,19 +19,12 @@ const BMI_SEGMENTS = [
     { label: "Obese II+", from: 35, to: 40, color: "bg-red-500" },
 ];
 
-const clamp = (value: number, min: number, max: number) => {
-    return Math.min(Math.max(value, min), max)
-}
-
-const getPercentage = (value: number) => {
-    return ((value - BMI_MIN) / (BMI_MAX - BMI_MIN)) * 100;
-};
-
 interface HomeBMIProps {
     user: User | null
 }
 
 const HomeBMI = ({ user }: HomeBMIProps) => {
+    console.log(user)
     if (!user) {
         return (
             <section>
@@ -43,7 +37,7 @@ const HomeBMI = ({ user }: HomeBMIProps) => {
         )
     }
 
-    if (!user.personinfo || user.personinfo.weight === "" || user.personinfo.height === "") {
+    if (!user.personinfo || !user.personinfo.weight || !user.personinfo.height) {
         return (
             <section>
                 <div className="flex items-center justify-between mb-4">
@@ -69,17 +63,8 @@ const HomeBMI = ({ user }: HomeBMIProps) => {
     const weight = parseFloat(user.personinfo.weight)
     const height = parseFloat(user.personinfo.height)
     const age = parseFloat(user.personinfo.age)
-    const bmi = Math.round(weight / Math.pow(height * 0.01, 2))
-    const clampedBMI = clamp(bmi, BMI_MIN, BMI_MAX);
-    const percentage = ((clampedBMI - BMI_MIN) / (BMI_MAX - BMI_MIN)) * 100;
-    let tdee
-    if (user.personinfo.gender === "Male") {
-        tdee = Math.floor((10 * weight) + (6.25 * height) - (5 * age) + 5);
-    } else if (user.personinfo.gender === "Female") {
-        tdee = Math.floor((10 * weight) + (6.25 * height) - (5 * age) - 161);
-    } else {
-        tdee = "-- Kcal"
-    }
+    const activity = parseFloat(user.personinfo.activity)
+    const { bmi, tdee, percentage } = caltdee(weight, height, age, user.personinfo.gender, activity)
 
     return (
         <section>

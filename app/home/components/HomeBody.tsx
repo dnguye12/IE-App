@@ -22,12 +22,14 @@ const HomeBody = ({ username }: HomeBodyProps) => {
                     const data = await res.json()
                     if (!data) {
                         setUser({
-                            plans: [], 
+                            plans: [],
                             personinfo: {
                                 age: "",
                                 gender: "",
                                 weight: "",
-                                height: ""
+                                height: "",
+                                kcal: "",
+                                activity: ""
                             }
                         })
                     } else {
@@ -46,8 +48,8 @@ const HomeBody = ({ username }: HomeBodyProps) => {
 
     return (
         <div className="flex-1 flex flex-col p-8 md:px-0 gap-12">
-            <HomePlans username={username} user={user}/>
-            <HomeBMI user={user}/>
+            <HomePlans username={username} user={user} />
+            <HomeBMI user={user} />
         </div>
     );
 }

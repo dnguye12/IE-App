@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { ArrowLeftIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { caltdee } from "@/utils/utils";
 
 interface AccountFormProps {
     username: string
@@ -22,6 +23,7 @@ const formSchema = z.object({
     gender: z.string(),
     weight: z.string().trim().min(1, "Weight is required"),
     height: z.string().trim().min(1, "Height is required"),
+    activity: z.string().trim()
 })
 
 const AccountForm = ({ username }: AccountFormProps) => {
@@ -35,7 +37,8 @@ const AccountForm = ({ username }: AccountFormProps) => {
             age: "",
             gender: "",
             weight: "",
-            height: ""
+            height: "",
+            activity: "1.375"
         }
     })
 
@@ -43,15 +46,7 @@ const AccountForm = ({ username }: AccountFormProps) => {
         if (isLoading) {
             const fetchData = async () => {
                 try {
-                    const res = await fetch("/api/homepage", {
-                        method: "POST",
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            username
-                        }),
-                    })
+                    const res = await fetch(`/api/v2/homepage?username=${username}`)
 
                     const data = await res.json()
                     if (!data) {
@@ -61,7 +56,9 @@ const AccountForm = ({ username }: AccountFormProps) => {
                                 age: "",
                                 gender: "",
                                 weight: "",
-                                height: ""
+                                height: "",
+                                kcal: "",
+                                activity: ""
                             }
                         })
                     } else {
@@ -88,12 +85,14 @@ const AccountForm = ({ username }: AccountFormProps) => {
             gender: user.personinfo.gender ?? "",
             weight: user.personinfo.weight ?? "",
             height: user.personinfo.height ?? "",
+            activity: user.personinfo.activity ?? "1.375"
         })
     }, [user, form])
 
     const onSubmit = async (data: z.infer<typeof formSchema>) => {
         try {
             setIsLoading(true)
+            const kcal = caltdee(parseFloat(data.weight), parseFloat(data.height), parseFloat(data.age), data.gender, parseFloat(data.activity))
             const res = await fetch("/api/v2/person", {
                 method: "PATCH",
                 headers: {
@@ -104,7 +103,9 @@ const AccountForm = ({ username }: AccountFormProps) => {
                     age: data.age,
                     gender: data.gender,
                     weight: data.weight,
-                    height: data.height
+                    height: data.height,
+                    kcal: kcal.tdee,
+                    activity: data.activity
                 })
             })
 
@@ -118,7 +119,9 @@ const AccountForm = ({ username }: AccountFormProps) => {
                         age: data.age,
                         gender: data.gender,
                         weight: data.weight,
-                        height: data.height
+                        height: data.height,
+                        kcal: "" + kcal.tdee,
+                        activity: data.activity
                     }
                 })
             } else {
@@ -225,6 +228,33 @@ const AccountForm = ({ username }: AccountFormProps) => {
                                 </FormItem>
                             )}
                         ></FormField>
+                        <p className="my-input-label">Activity level</p>
+                        <Controller
+                            name="activity"
+                            control={form.control}
+                            render={({ field, fieldState }) => (
+                                <Select
+                                    name={field.name}
+                                    value={field.value}
+                                    onValueChange={field.onChange}
+                                >
+                                    <SelectTrigger
+                                        aria-invalid={fieldState.invalid}
+                                        className="my-input bg-background! w-full text-muted-foreground!"
+                                    >
+                                        <SelectValue placeholder="Select" />
+                                    </SelectTrigger>
+                                    <SelectContent position="item-aligned">
+                                        <SelectItem value="1.2">Sedentary (Little or no exercise)</SelectItem>
+                                        <SelectItem value="1.375">Lightly active (1-3 days/week)</SelectItem>
+                                        <SelectItem value="1.55">Moderately active (3-5 days/week)</SelectItem>
+                                        <SelectItem value="1.725">Very active (6-7 days/week)</SelectItem>
+                                        <SelectItem value="1.9">Extremely active (Daily, professional)</SelectItem>
+
+                                    </SelectContent>
+                                </Select>
+                            )}
+                        ></Controller>
                         <Button type="submit" disabled={isLoading} size={"lg"} variant={"green"} className="font-semibold h-14 w-full rounded-full mx-auto text-lg">Update Info</Button>
                     </form>
                 </Form>

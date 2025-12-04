@@ -9,6 +9,8 @@ export const users = pgTable("users", {
     gender: text("gender"),
     weight: text("weight"),
     height: text("height"),
+    kcal: text("kcal"),
+    activity: text("activity"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull()
 })

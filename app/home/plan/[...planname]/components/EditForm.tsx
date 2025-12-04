@@ -77,7 +77,9 @@ const EditForm = ({ planname, username }: EditFormProps) => {
                                 age: "",
                                 gender: "",
                                 weight: "",
-                                height: ""
+                                height: "",
+                                kcal: "",
+                                activity: ""
                             }
                         })
                     } else {
@@ -114,15 +116,15 @@ const EditForm = ({ planname, username }: EditFormProps) => {
                             notWantedFoods: []
                         })
 
-                        if(data.dr.foods?.length > 0) {
-                            for(const food of data.dr.foods) {
+                        if (data.dr.foods?.length > 0) {
+                            for (const food of data.dr.foods) {
                                 wantedField.append(food)
                             }
                         }
 
-                        if(data.dr.notWantedFoods?.length > 0) {
-                            for(const food of data.dr.notWantedFoods) {
-                                notWantedField.append({name: food})
+                        if (data.dr.notWantedFoods?.length > 0) {
+                            for (const food of data.dr.notWantedFoods) {
+                                notWantedField.append({ name: food })
                             }
                         }
                     }
@@ -441,7 +443,7 @@ const EditForm = ({ planname, username }: EditFormProps) => {
                         <h5 className="font-semibold">Plan Result</h5>
                         {plan?.nutritionSummary && (
                             <div className="flex gap-x-2">
-                                 <div className="text-xs rounded-full bg-blue-200/50 text-blue-700 p-1">Calorie: {Math.floor(plan.nutritionSummary.totalCalories)}</div>
+                                <div className="text-xs rounded-full bg-blue-200/50 text-blue-700 p-1">Calorie: {Math.floor(plan.nutritionSummary.totalCalories)}</div>
                                 <div className="text-xs rounded-full bg-blue-200/50 text-blue-700 p-1">Protein: {Math.floor(plan.nutritionSummary.totalProtein)}</div>
                                 <div className="text-xs rounded-full bg-blue-200/50 text-blue-700 p-1">Carbs: {Math.floor(plan.nutritionSummary.totalCarbs)}</div>
                                 <div className="text-xs rounded-full bg-blue-200/50 text-blue-700 p-1">Fats: {Math.floor(plan.nutritionSummary.totalFat)}</div>

@@ -5,14 +5,16 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function PATCH(req: NextRequest) {
     const body = await req.json()
-    const { username, age, gender, weight, height } = body
+    const { username, age, gender, weight, height, kcal, activity } = body
 
     try {
         const [user] = await db.update(users).set({
             age,
             gender,
             weight,
-            height
+            height,
+            kcal,
+            activity
         }).where(eq(users.username, username)).returning()
 
         if (!user) {

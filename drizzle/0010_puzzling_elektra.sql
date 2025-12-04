@@ -1,0 +1,1 @@
+ALTER TABLE "users" ALTER COLUMN "kcal" SET DATA TYPE text;
