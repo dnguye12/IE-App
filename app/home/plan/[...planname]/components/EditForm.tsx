@@ -43,8 +43,8 @@ const EditForm = ({ planname, username }: EditFormProps) => {
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            planname,
-            targetCalories: 2000,
+            planname: "",
+            targetCalories: 0,
             protein: 30,
             carbs: 50,
             fats: 20,
@@ -58,14 +58,14 @@ const EditForm = ({ planname, username }: EditFormProps) => {
     const notWantedField = useFieldArray({ control, name: "notWantedFoods" })
     const [user, setUser] = useState<User | null>(null)
     const [pending, setPending] = useState<boolean>(false)
+    const [loadingUser, setLoadingUser] = useState<boolean>(true)
     const [plan, setPlan] = useState<any>(null)
     const [request, setRequest] = useState<any>(null)
     const router = useRouter()
 
     useEffect(() => {
-        if (pending) {
+        if (loadingUser) {
             const fetchData = async () => {
-                setPending(true)
                 try {
                     const res = await fetch(`/api/v2/homepage?username=${username}`)
 
@@ -88,13 +88,13 @@ const EditForm = ({ planname, username }: EditFormProps) => {
                 } catch (error) {
                     console.log(error)
                 } finally {
-                    setPending(false)
+                    setLoadingUser(false)
                 }
             }
 
             fetchData()
         }
-    }, [pending, username])
+    }, [loadingUser, username, form])
 
     useEffect(() => {
         if (planname && username) {
@@ -108,10 +108,10 @@ const EditForm = ({ planname, username }: EditFormProps) => {
                         setRequest(data.dr)
                         form.reset({
                             planname,
-                            targetCalories: data.result.inputSummary["Target Calories"],
-                            protein: data.result.nutritionSummary["Protein %"],
-                            carbs: data.result.nutritionSummary["Carbs "],
-                            fats: data.result.nutritionSummary["Fat %"],
+                            targetCalories: data.dr.targetCalories,
+                            protein: data.dr.macros.protein,
+                            carbs: data.dr.macros.carbs,
+                            fats: data.dr.macros.fats,
                             wantedFoods: [],
                             notWantedFoods: []
                         })
@@ -232,6 +232,7 @@ const EditForm = ({ planname, username }: EditFormProps) => {
                                                 type="text"
                                                 {...field}
                                                 className="rounded-full"
+                                                disabled={loadingUser}
                                             />
                                         </FormControl>
                                         <FormMessage />
@@ -249,6 +250,7 @@ const EditForm = ({ planname, username }: EditFormProps) => {
                                                 type="number"
                                                 {...field}
                                                 className="rounded-full"
+                                                disabled={loadingUser}
                                             />
                                         </FormControl>
                                         <FormMessage />

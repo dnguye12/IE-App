@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { db } from "@/db";
 import { plans } from "@/db/schemas/plans";
+import { eq } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
@@ -8,6 +9,17 @@ export async function POST(req: NextRequest) {
     const { username, planname, dr, result } = body
 
     try {
+        const [existing] = await db.select().from(plans).where(eq(plans.planname, planname))
+
+        if(existing) {
+            const updatedPlan = await db.update(plans).set({
+                dr,
+                result
+            }).where(eq(plans.id, existing.id))
+
+            return NextResponse.json(updatedPlan)
+        }
+
         const [res] = await db.insert(plans).values({
             username,
             planname,

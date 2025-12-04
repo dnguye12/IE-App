@@ -42,7 +42,7 @@ const GenerateForm = ({ username }: GenerateFormProps) => {
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            planname: `Plan-${Math.floor(Math.random() * 2000)}`,
+            planname: "",
             targetCalories: 2000,
             protein: 30,
             carbs: 50,
@@ -57,14 +57,14 @@ const GenerateForm = ({ username }: GenerateFormProps) => {
     const notWantedField = useFieldArray({ control, name: "notWantedFoods" })
     const [user, setUser] = useState<User | null>(null)
     const [pending, setPending] = useState<boolean>(false)
+    const [loadingUser, setLoadingUser] = useState<boolean>(true)
     const [plan, setPlan] = useState<any>(null)
     const [request, setRequest] = useState<any>(null)
     const router = useRouter()
 
     useEffect(() => {
-        if (pending) {
+        if (loadingUser) {
             const fetchData = async () => {
-                setPending(true)
                 try {
                     const res = await fetch(`/api/v2/homepage?username=${username}`)
 
@@ -83,17 +83,19 @@ const GenerateForm = ({ username }: GenerateFormProps) => {
                         })
                     } else {
                         setUser(data)
+                        form.setValue("targetCalories", Math.floor(data.personinfo.kcal))
+                        form.setValue("planname", `Plan-${Math.floor(Math.random() * 2000)}`)
                     }
                 } catch (error) {
                     console.log(error)
                 } finally {
-                    setPending(false)
+                    setLoadingUser(false)
                 }
             }
 
             fetchData()
         }
-    }, [pending, username])
+    }, [loadingUser, username, form])
 
     const onSubmit = async (data: z.infer<typeof formSchema>) => {
         let protein = data.protein
@@ -208,6 +210,7 @@ const GenerateForm = ({ username }: GenerateFormProps) => {
                                                 type="text"
                                                 {...field}
                                                 className="rounded-full"
+                                                disabled={loadingUser}
                                             />
                                         </FormControl>
                                         <FormMessage />
@@ -225,6 +228,7 @@ const GenerateForm = ({ username }: GenerateFormProps) => {
                                                 type="number"
                                                 {...field}
                                                 className="rounded-full"
+                                                disabled={loadingUser}
                                             />
                                         </FormControl>
                                         <FormMessage />
@@ -419,9 +423,10 @@ const GenerateForm = ({ username }: GenerateFormProps) => {
                         <h5 className="font-semibold">Plan Result</h5>
                         {plan?.nutritionSummary && (
                             <div className="flex gap-x-2">
-                                <div className="text-xs rounded-full bg-blue-200/50 text-blue-700 p-1">Protein: {plan.nutritionSummary.totalProtein}</div>
-                                <div className="text-xs rounded-full bg-blue-200/50 text-blue-700 p-1">Carbs: {plan.nutritionSummary.totalCarbs}</div>
-                                <div className="text-xs rounded-full bg-blue-200/50 text-blue-700 p-1">Fats: {plan.nutritionSummary.totalFat}</div>
+                                <div className="text-xs rounded-full bg-blue-200/50 text-blue-700 p-1">Calorie: {Math.floor(plan.nutritionSummary.totalCalories)}</div>
+                                <div className="text-xs rounded-full bg-blue-200/50 text-blue-700 p-1">Protein: {Math.floor(plan.nutritionSummary.totalProtein)}</div>
+                                <div className="text-xs rounded-full bg-blue-200/50 text-blue-700 p-1">Carbs: {Math.floor(plan.nutritionSummary.totalCarbs)}</div>
+                                <div className="text-xs rounded-full bg-blue-200/50 text-blue-700 p-1">Fats: {Math.floor(plan.nutritionSummary.totalFat)}</div>
                             </div>
                         )}
                     </div>
@@ -442,10 +447,10 @@ const GenerateForm = ({ username }: GenerateFormProps) => {
                                     <TableRow key={`plan-${idx}`} className="font-light">
                                         <TableCell>{p.name} {p.isAutoAdded && "(Auto)"}</TableCell>
                                         <TableCell>{Math.floor(p.grams)}</TableCell>
-                                        <TableCell>{Math.floor(p.calories)}</TableCell>
-                                        <TableCell>{Math.floor(p.protein)}</TableCell>
-                                        <TableCell>{Math.floor(p.carbs)}</TableCell>
-                                        <TableCell>{Math.floor(p.fats)}</TableCell>
+                                        <TableCell>{Math.floor(p.calories * p.grams / 100)}</TableCell>
+                                        <TableCell>{Math.floor(p.protein * p.grams / 100)}</TableCell>
+                                        <TableCell>{Math.floor(p.carbs * p.grams / 100)}</TableCell>
+                                        <TableCell>{Math.floor(p.fats * p.grams / 100)}</TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>
@@ -467,7 +472,7 @@ const GenerateForm = ({ username }: GenerateFormProps) => {
                         variant={"green"}
                         size={"lg"}
                         className="rounded-full w-full"
-                        disabled={pending || !plan || !request}
+                        disabled={pending || !plan || loadingUser}
                         onClick={onSave}
                     >Save Plan To Database</Button>
                 </div>
