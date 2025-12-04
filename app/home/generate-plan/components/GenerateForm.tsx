@@ -360,7 +360,7 @@ const GenerateForm = ({ username }: GenerateFormProps) => {
                             </section>
                             <Separator />
                             <section>
-                                <h5 className="font-semibold mb-4">3. Unwanted Foods (Blacklist)</h5>
+                                <h5 className="font-semibold mb-4">3. Eaten Foods</h5>
                                 <div className="space-y-4">
                                     {
                                         notWantedField.fields.map((field, idx) => (
