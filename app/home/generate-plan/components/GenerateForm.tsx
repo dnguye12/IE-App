@@ -118,8 +118,6 @@ const GenerateForm = ({ username }: GenerateFormProps) => {
             }
 
             const request = {
-                username,
-                planname: data.planname,
                 targetCalories: data.targetCalories,
                 foods: data.wantedFoods,
                 notWantedFoods: data.notWantedFoods.map((n) => n.name),

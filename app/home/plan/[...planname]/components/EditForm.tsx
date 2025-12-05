@@ -112,21 +112,14 @@ const EditForm = ({ planname, username }: EditFormProps) => {
                             protein: data.dr.macros.protein,
                             carbs: data.dr.macros.carbs,
                             fats: data.dr.macros.fats,
-                            wantedFoods: [],
-                            notWantedFoods: []
+                            wantedFoods: (data.dr.foods ?? []).map((f: any) => ({
+                                foodNames: f.foodNames,
+                                foodQuantity: f.foodQuantity,
+                            })),
+                            notWantedFoods: (data.dr.notWantedFoods ?? []).map((n: string) => ({
+                                name: n,
+                            }))
                         })
-
-                        if (data.dr.foods?.length > 0) {
-                            for (const food of data.dr.foods) {
-                                wantedField.append(food)
-                            }
-                        }
-
-                        if (data.dr.notWantedFoods?.length > 0) {
-                            for (const food of data.dr.notWantedFoods) {
-                                notWantedField.append({ name: food })
-                            }
-                        }
                     }
                 } catch (error) {
                     console.log(error)
@@ -147,8 +140,6 @@ const EditForm = ({ planname, username }: EditFormProps) => {
             }
 
             const request = {
-                username,
-                planname: data.planname,
                 targetCalories: data.targetCalories,
                 foods: data.wantedFoods,
                 notWantedFoods: data.notWantedFoods.map((n) => n.name),
@@ -213,6 +204,8 @@ const EditForm = ({ planname, username }: EditFormProps) => {
     const handleBack = () => {
         router.push("/home")
     }
+
+    console.log(request)
 
     return (
         <div className="flex-1 p-8 md:px-0">

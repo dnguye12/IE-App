@@ -5,15 +5,12 @@ import { Food } from "@/utils/types";
 import { eq } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 
-const TARGET_CARBS_PERCENT = 50.0;
-const TARGET_PROTEIN_PERCENT = 30.0;
-const TARGET_FAT_PERCENT = 20.0;
 const MIN_VEGETABLE_GRAMS = 200.0;
 const MIN_FRUIT_GRAMS = 150.0;
 
 export async function POST(req: NextRequest) {
     const body = await req.json()
-    const { targetCalories, foods, notWantedFoods } = body
+    const { targetCalories, foods, notWantedFoods, macros } = body
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const res: any = {
@@ -77,7 +74,7 @@ export async function POST(req: NextRequest) {
     remainingCal = applyVegetableConstraint(variableList, remainingCal)
     remainingCal = applyFruitConstraint(variableList, remainingCal)
 
-    allocateRemainingBudget(variableList, remainingCal)
+    allocateRemainingBudget(variableList, remainingCal, macros)
 
     let finalPlan: Food[] = []
     finalPlan = finalPlan.concat(fixedList)
@@ -203,14 +200,18 @@ const applyFruitConstraint = (variableList: Food[], remainingCal: number) => {
     return Math.max(0, helper)
 }
 
-const allocateRemainingBudget = (variableList: Food[], remainingCal: number) => {
+const allocateRemainingBudget = (variableList: Food[], remainingCal: number, macros: {
+    protein: number;
+    carbs: number;
+    fats: number;
+}) => {
     if (remainingCal <= 0) {
         return
     }
 
-    let proteinBudget = remainingCal * (TARGET_PROTEIN_PERCENT / 100)
-    let carbsBudget = remainingCal * (TARGET_CARBS_PERCENT / 100.0);
-    let fatBudget = remainingCal * (TARGET_FAT_PERCENT / 100.0);
+    let proteinBudget = remainingCal * (macros.protein / 100)
+    let carbsBudget = remainingCal * (macros.carbs / 100.0);
+    let fatBudget = remainingCal * (macros.fats / 100.0);
 
     const pGroup: Food[] = []
     const cGroup: Food[] = []
