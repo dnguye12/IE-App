@@ -293,7 +293,7 @@ const GenerateForm = ({ username }: GenerateFormProps) => {
                             </section>
                             <Separator />
                             <section>
-                                <h5 className="font-semibold mb-4">2. Wanted Foods</h5>
+                                <h5 className="font-semibold mb-4">2. Wanted Foods & Eaten Foods</h5>
                                 <div className="space-y-4">
                                     {
                                         wantedField.fields.map((field, idx) => (
@@ -358,7 +358,7 @@ const GenerateForm = ({ username }: GenerateFormProps) => {
                             </section>
                             <Separator />
                             <section>
-                                <h5 className="font-semibold mb-4">3. Eaten Foods</h5>
+                                <h5 className="font-semibold mb-4">3. Unwanted Foods</h5>
                                 <div className="space-y-4">
                                     {
                                         notWantedField.fields.map((field, idx) => (
@@ -399,7 +399,7 @@ const GenerateForm = ({ username }: GenerateFormProps) => {
                                         onClick={() => notWantedField.append({ name: "" })}
                                         className="rounded-full w-full"
                                     >
-                                        Add unwanted
+                                        Add unwanted foods
                                     </Button>
                                 </div>
                             </section>
