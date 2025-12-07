@@ -102,7 +102,7 @@ const EditForm = ({ planname, username }: EditFormProps) => {
                 try {
                     const res = await fetch(`/api/v2/get-plan?username=${username}&planname=${planname}`)
                     const data = await res.json()
-
+                    
                     if (data) {
                         setPlan(data.result)
                         setRequest(data.dr)
@@ -181,7 +181,7 @@ const EditForm = ({ planname, username }: EditFormProps) => {
                 },
                 body: JSON.stringify({
                     username,
-                    planname: request.planname,
+                    planname: form.getValues().planname,
                     dr: request,
                     result: plan
                 })
