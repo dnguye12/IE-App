@@ -121,7 +121,8 @@ const GenerateForm = ({ username }: GenerateFormProps) => {
                 targetCalories: data.targetCalories,
                 foods: data.wantedFoods,
                 notWantedFoods: data.notWantedFoods.map((n) => n.name),
-                macros
+                macros,
+                planname: data.planname
             }
             setRequest(request)
             const res = await fetch("/api/v2/generate-plan", {
@@ -409,7 +410,7 @@ const GenerateForm = ({ username }: GenerateFormProps) => {
                                 variant={"green"}
                                 size={"lg"}
                                 className="rounded-full w-full"
-                                disabled={pending || !form.formState.isValid}
+                                disabled={pending}
                             >
                                 Generate / Regenerate
                             </Button>

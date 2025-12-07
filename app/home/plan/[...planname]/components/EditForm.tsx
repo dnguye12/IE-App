@@ -143,7 +143,8 @@ const EditForm = ({ planname, username }: EditFormProps) => {
                 targetCalories: data.targetCalories,
                 foods: data.wantedFoods,
                 notWantedFoods: data.notWantedFoods.map((n) => n.name),
-                macros
+                macros,
+                planname: data.planname
             }
 
             setRequest(request)
@@ -204,8 +205,6 @@ const EditForm = ({ planname, username }: EditFormProps) => {
     const handleBack = () => {
         router.push("/home")
     }
-
-    console.log(request)
 
     return (
         <div className="flex-1 p-8 md:px-0">

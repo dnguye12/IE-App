@@ -5,12 +5,11 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function DELETE(req: NextRequest) {
     const body = await req.json()
-    const { username, planname } = body
+    const { planId } = body
     try {
         await db.delete(plans).where(
             and(
-                eq(plans.username, username),
-                eq(plans.planname, planname)
+                eq(plans.id, planId)
             )
         )
          return new NextResponse("Delete successfully", { status: 203 })

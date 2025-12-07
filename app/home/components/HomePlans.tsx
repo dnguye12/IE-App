@@ -8,11 +8,10 @@ import { PlusIcon, TrashIcon } from "lucide-react";
 import Link from "next/link";
 
 interface HomePlansProps {
-    username: string;
     user: User | null
 }
 
-const HomePlans = ({ username, user }: HomePlansProps) => {
+const HomePlans = ({ user }: HomePlansProps) => {
     if (!user) {
         return (
             <section>
@@ -30,7 +29,7 @@ const HomePlans = ({ username, user }: HomePlansProps) => {
         )
     }
 
-    const handleDelete = async (username: string, planname: string) => {
+    const handleDelete = async (planId: string) => {
         try {
             const res = await fetch("/api/v2/delete-plan", {
                 method: "DELETE",
@@ -38,8 +37,7 @@ const HomePlans = ({ username, user }: HomePlansProps) => {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    username,
-                    planname
+                    planId
                 })
             })
             if (res.ok) {
@@ -87,7 +85,7 @@ const HomePlans = ({ username, user }: HomePlansProps) => {
                                                 </AlertDialogHeader>
                                                 <AlertDialogFooter>
                                                     <AlertDialogCancel className="hover:text-white">Cancel</AlertDialogCancel>
-                                                    <AlertDialogAction onClick={() => handleDelete(username, plan.planname)}>Continue</AlertDialogAction>
+                                                    <AlertDialogAction onClick={() => handleDelete(plan.id)}>Continue</AlertDialogAction>
                                                 </AlertDialogFooter>
                                             </AlertDialogContent>
                                         </AlertDialog>
