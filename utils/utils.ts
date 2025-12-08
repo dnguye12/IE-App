@@ -11,9 +11,9 @@ export const caltdee = (weight: number, height: number, age: number, gender: str
     const percentage = ((clampedBMI - BMI_MIN) / (BMI_MAX - BMI_MIN)) * 100;
     let tdee
     if (gender === "Male") {
-        tdee = Math.floor((10 * weight) + (6.25 * height) - (5 * age) + 5) * activity;
+        tdee = Math.floor(((10 * weight) + (6.25 * height) - (5 * age) + 5) * activity);
     } else if (gender === "Female") {
-        tdee = Math.floor((10 * weight) + (6.25 * height) - (5 * age) - 161) * activity;
+        tdee = Math.floor(((10 * weight) + (6.25 * height) - (5 * age) - 161) * activity);
     } else {
         tdee = "Nan"
     }
